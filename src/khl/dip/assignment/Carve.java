@@ -2,14 +2,16 @@
 package khl.dip.assignment;
 
 import ij.ImagePlus;
-import ij.gui.ImageWindow;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
 public class Carve {
+    private final Desaturate desaturate = new Desaturate();
+    private final Gray8Max grayMax = new Gray8Max();
     private ImageProcessor imgProcessor;
     private ByteProcessor grayscale;
+    private final Sobel sobel = new Sobel();
     private int[] toRemove;
     private CumulativeImportance ci;
     private ImagePlus img;
@@ -17,8 +19,9 @@ public class Carve {
     public Carve(ImagePlus img) {
         this.imgProcessor = img.getProcessor();
         this.img = img;
-        
-        int iterations = 1000;
+    }
+    
+    public void benchMark(int iterations) {
         long startTime, endTime, diff;
         
         System.out.println("Starting benchmark. " + iterations + " iterations");
@@ -65,6 +68,45 @@ public class Carve {
  
     }
     
+    public void benchmarkImportance(int iterations) {
+        long startTime, endTime, diff;
+        
+        System.out.println(iterations + " iterations");
+        
+        /// DESATURATE ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            desaturate.applyTo(imgProcessor);
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Desaturate:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+
+        this.grayscale = desaturate.applyTo(imgProcessor);
+        
+        /// Sobel ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            sobel.applyTo((ByteProcessor) grayscale.duplicate());
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Sobel:\t\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+
+        /// Graymax ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            grayMax.applyTo((ByteProcessor) grayscale.duplicate());
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Graymax:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+
+    }
+    
     public Carve(ImagePlus img, int linesToRemove) {
         this.img = img;
         this.imgProcessor = img.getProcessor();
@@ -90,12 +132,7 @@ public class Carve {
     }
     
     // Step 1: Compute the Importance
-    private void importance() {
-        // Prepare tools, filters
-        Desaturate desaturate = new Desaturate();
-        Sobel sobel = new Sobel();
-        Gray8Max grayMax = new Gray8Max();
-        
+    private void importance() {        
         // Create a grayscale copy of the current image.
         this.grayscale = desaturate.applyTo(imgProcessor);
         
@@ -148,6 +185,7 @@ public class Carve {
         ImagePlus img = new ImagePlus("tower.png");
         
         Carve carve = new Carve(img);
+        carve.benchmarkImportance(1000);
         //img = carve.getImage();
         
         //ImageWindow window = new ImageWindow(img);
