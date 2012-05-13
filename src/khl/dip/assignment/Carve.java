@@ -21,7 +21,7 @@ public class Carve {
         this.img = img;
     }
     
-    public void benchMark(int iterations) {
+    public void benchmark(int iterations) {
         long startTime, endTime, diff;
         
         System.out.println("Starting benchmark. " + iterations + " iterations");
@@ -185,7 +185,8 @@ public class Carve {
         ImagePlus img = new ImagePlus("tower.png");
         
         Carve carve = new Carve(img);
-        carve.benchmarkImportance(1000);
+        carve.benchmark(5000);
+        carve.benchmarkImportance(5000);
         //img = carve.getImage();
         
         //ImageWindow window = new ImageWindow(img);
