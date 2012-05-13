@@ -14,6 +14,57 @@ public class Carve {
     private CumulativeImportance ci;
     private ImagePlus img;
     
+    public Carve(ImagePlus img) {
+        this.imgProcessor = img.getProcessor();
+        this.img = img;
+        
+        int iterations = 1000;
+        long startTime, endTime, diff;
+        
+        System.out.println("Starting benchmark. " + iterations + " iterations");
+        
+        /// IMPORTANCE ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            importance();
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Importance:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+    
+        /// CUMULATIVE ///      
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            cumulativeImportance();
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Cumulative:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+        
+        /// MINIMAL ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            minimalImportance();
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Minimal:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+         
+        /// REMOVAL ///
+        startTime = System.currentTimeMillis();
+        for (int i = 0; i < iterations; i++) {
+            removeLeastImportant();
+        }
+        endTime = System.currentTimeMillis();
+        diff = endTime - startTime;
+        
+        System.out.println("Removal:\t" + diff + "ms\t" + iterations + " iterations\t" + ((double)diff/iterations) + " average");
+ 
+    }
+    
     public Carve(ImagePlus img, int linesToRemove) {
         this.img = img;
         this.imgProcessor = img.getProcessor();
@@ -90,16 +141,16 @@ public class Carve {
             }
         }
         
-        imgProcessor = newIp;
+        //imgProcessor = newIp;
     }
     
     public static void main(String[] args) {
         ImagePlus img = new ImagePlus("tower.png");
         
-        Carve carve = new Carve(img, 200);
-        img = carve.getImage();
+        Carve carve = new Carve(img);
+        //img = carve.getImage();
         
-        ImageWindow window = new ImageWindow(img);
-        window.setVisible(true);
+        //ImageWindow window = new ImageWindow(img);
+        //window.setVisible(true);
     }
 }
