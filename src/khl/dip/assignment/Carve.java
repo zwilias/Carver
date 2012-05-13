@@ -2,6 +2,7 @@
 package khl.dip.assignment;
 
 import ij.ImagePlus;
+import ij.gui.ImageWindow;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
@@ -10,7 +11,7 @@ public class Carve {
     private final Desaturate desaturate = new Desaturate();
     private final Gray8Max grayMax = new Gray8Max();
     private ImageProcessor imgProcessor;
-    private ByteProcessor grayscale;
+    private int[][] grayscale;
     private final Sobel sobel = new Sobel();
     private int[] toRemove;
     private CumulativeImportance ci;
@@ -88,7 +89,7 @@ public class Carve {
         /// Sobel ///
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            sobel.applyTo((ByteProcessor) grayscale.duplicate());
+            sobel.applyTo(grayscale);
         }
         endTime = System.currentTimeMillis();
         diff = endTime - startTime;
@@ -98,7 +99,7 @@ public class Carve {
         /// Graymax ///
         startTime = System.currentTimeMillis();
         for (int i = 0; i < iterations; i++) {
-            grayMax.applyTo((ByteProcessor) grayscale.duplicate());
+            grayMax.applyTo(grayscale);
         }
         endTime = System.currentTimeMillis();
         diff = endTime - startTime;
@@ -112,15 +113,10 @@ public class Carve {
         this.imgProcessor = img.getProcessor();
         
         while (linesToRemove > 0) {
-            System.out.print("Importance, ");
             importance();
-            System.out.print("Cumulative, ");
             cumulativeImportance();
-            System.out.print("Minimal, ");
             minimalImportance();
-            System.out.print("Removing..");
             removeLeastImportant();
-            System.out.println(" left: " + linesToRemove);
             linesToRemove--;
         }
         
@@ -137,10 +133,10 @@ public class Carve {
         this.grayscale = desaturate.applyTo(imgProcessor);
         
         // Apply the Sobel operator to the grayscale copy to detect edges.
-        sobel.applyTo(grayscale);
+        this.grayscale = sobel.applyTo(grayscale);
         
         // Apply a 3x3 maximum filter to spread the influence of edges to nearby pixels. 
-        grayMax.applyTo(grayscale);
+        this.grayscale = grayMax.applyTo(grayscale);
     }
     
     // Step 2: Compute the Cumulative Importance
@@ -178,15 +174,18 @@ public class Carve {
             }
         }
         
+        // TODO: Don't forget to uncomment this line
+        // it doesn't actually work without it, but it ruins the benching
         //imgProcessor = newIp;
     }
     
     public static void main(String[] args) {
         ImagePlus img = new ImagePlus("tower.png");
         
+        //Carve carve = new Carve(img, 200);
         Carve carve = new Carve(img);
-        carve.benchmark(5000);
-        carve.benchmarkImportance(5000);
+        //carve.benchmark(5000);
+        carve.benchmarkImportance(500);
         //img = carve.getImage();
         
         //ImageWindow window = new ImageWindow(img);
