@@ -2,6 +2,7 @@ package khl.dip.assignment;
 
 import ij.process.ByteProcessor;
 
+// TODO: multithreaded?
 public abstract class Gray8NeighborhoodOperation {
 
     public Gray8NeighborhoodOperation() {
