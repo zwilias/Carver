@@ -2,21 +2,22 @@ package khl.dip.assignment;
 
 import ij.process.ByteProcessor;
 
-// TODO: multithreaded?
 public abstract class Gray8NeighborhoodOperation {
 
     public Gray8NeighborhoodOperation() {
     }
-
-    public void applyTo(ByteProcessor ip) {
-        ByteProcessor copy = (ByteProcessor) ip.duplicate();
-        for (int x = 0; x < ip.getWidth(); x++) {
-            for (int y = 0; y < ip.getHeight(); y++) {
-                int newColor = f(copy, x, y);
-                ip.putPixel(x, y, newColor);
+    
+    public int[][] applyTo(final int[][] pixels) {
+        final int[][] result = new int[pixels.length][pixels[0].length];
+        
+        for (int x = 0; x < pixels.length; x++) {
+            for (int y = 0; y < pixels[0].length; y++) {
+                result[x][y] = f(pixels, x, y);
             }
         }
+        
+        return result;
     }
 
-    protected abstract int f(ByteProcessor ip, int x, int y);
+    protected abstract int f(final int[][] pixels, final int x, final int y);
 }

@@ -1,40 +1,41 @@
 
 package khl.dip.assignment;
 
-import ij.process.ByteProcessor;
 import java.util.Collections;
 import java.util.LinkedList;
 
 public class CumulativeImportance {
     private final int[][] ci;
     private final int[][] directions;
-    private final ByteProcessor bp;
+    private final int width;
+    private final int height;
     
-    public CumulativeImportance(final ByteProcessor bp) {
-        this.bp = bp;
+    public CumulativeImportance(final int[][] pixels) {
+        this.width = pixels.length;
+        this.height = pixels[0].length;
         
         // By saving these with the y as the first index, we can extract an entire
         // line later on - easier that way.
-        ci = new int[bp.getHeight()][bp.getWidth()];
-        directions = new int[bp.getWidth()][bp.getHeight()];
+        ci = new int[this.height][this.width];
+        directions = new int[this.width][this.height];
         
         // Copy the first line into the cumulativeImportance matrix
-        for (int x = 0; x < bp.getWidth(); x++) {
-            ci[0][x] = bp.getPixel(x, 0);
+        for (int x = 0; x < this.width; x++) {
+            ci[0][x] = pixels[x][0];
         }
         
         // Run through the rest of the lines, figuring out their minimal
         // cumulative importance along the way.
-        for (int y = 1; y < bp.getHeight(); y++) {
-            for (int x = 0; x < bp.getWidth(); x++) {
-                int imp = bp.getPixel(x, y);
+        for (int y = 1; y < this.height; y++) {
+            for (int x = 0; x < this.width; x++) {
+                int imp = pixels[x][y];
                 int minUp;
                 
                 if (x == 0) {
                     if (ci[y-1][x] > ci[y-1][x+1]) {
                         directions[x][y] = 1;
                     }
-                } else if (x == bp.getWidth()-1) {
+                } else if (x == this.width-1) {
                     if (ci[y-1][x-1] < ci[y-1][x]) {
                         directions[x][y] = -1;
                     }
@@ -55,11 +56,11 @@ public class CumulativeImportance {
     }
     
     public int[] getCumulativeImportance() {
-        return ci[bp.getHeight()-1];
+        return ci[this.height-1];
     }
     
     public int[] getLine(int x) {
-        final int[] result = new int[bp.getHeight()];
+        final int[] result = new int[this.height];
         
         result[result.length-1] = x;
         
@@ -120,9 +121,9 @@ public class CumulativeImportance {
      *  that should be removed.
      */
     public int[][] getLeastImportantAsMatrix(final int count) {
-        final int[][] result = new int[bp.getWidth()][bp.getHeight()];
+        final int[][] result = new int[this.width][this.height];
         
-        final int height = bp.getHeight();
+        final int height = this.height;
         
         final int[] lines = getLeastImportantLines(count);
         for (int line : lines) {
