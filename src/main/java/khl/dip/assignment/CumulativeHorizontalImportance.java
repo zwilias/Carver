@@ -58,7 +58,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
     
     @Override
     public int[] getCumulativeImportance() {
-        int[] result = new int[this.width];
+        int[] result = new int[this.height];
         for (int i = 0; i < this.height; i++) {
             result[i] = importanceGrid[i][this.width-1];
         }
