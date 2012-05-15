@@ -20,6 +20,7 @@ public class Carve {
     private final Sobel sobel = new Sobel();
     private int[] toRemove;
     private CumulativeVerticalImportance cvi;
+    private CumulativeHorizontalImportance chi;
     
     // Params
     @Parameter(
@@ -40,6 +41,12 @@ public class Carve {
             description = "File to write the carved image to. (If not provided, image is displayed."
             )
     private String outFile;
+    
+    @Parameter(
+            names = {"-h", "--horizontal"},
+            description = "Number of horizontal lines to be removed."
+            )
+    private int horizontalLinesToRemove = 0;
     
     public void benchmark(int iterations) {
         long startTime, endTime, diff;
