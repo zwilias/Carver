@@ -2,10 +2,15 @@
 package khl.dip.assignment;
 
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 import ij.ImagePlus;
+import ij.gui.ImageWindow;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class Carve {
     private final Desaturate desaturate = new Desaturate();
@@ -29,6 +34,12 @@ public class Carve {
             description = "Number of vertical lines to be removed. (default 200)"
             )
     private int linesToRemove = 200;
+    
+    @Parameter(
+            names = {"-o", "--output"},
+            description = "File to write the carved image to. (If not provided, image is displayed."
+            )
+    private String outFile;
     
     public void benchmark(int iterations) {
         long startTime, endTime, diff;
@@ -128,6 +139,8 @@ public class Carve {
         }
         
         img.setProcessor(imgProcessor);
+        
+        showOrSave();
     }
     
     public ImagePlus getImage() {
@@ -184,5 +197,19 @@ public class Carve {
         // TODO: Don't forget to uncomment this line
         // it doesn't actually work without it, but it ruins the benching
         imgProcessor = newIp;
+    }
+
+    private void showOrSave() {
+        if (outFile == null) {
+            ImageWindow window = new ImageWindow(img);
+            window.setVisible(true);
+        } else {
+            try {
+                String type = outFile.substring(outFile.lastIndexOf(".") + 1);
+                ImageIO.write(img.getBufferedImage(), type, new File(outFile));
+            } catch (IOException ex) {
+                throw new ParameterException("Could not write to " + outFile + ": " + ex.getMessage());
+            }
+        }
     }
 }
