@@ -26,12 +26,12 @@ public class Carve {
             names = {"-i", "--input"}, 
             converter = ImagePlusConverter.class, 
             required = true,
-            description = "Input file (must be an image)")
+            description = "Input image")
     private ImagePlus img;
     
     @Parameter(
             names = {"-l", "--lines"},
-            description = "Number of vertical lines to be removed. (default 200)"
+            description = "Number of vertical lines to be removed."
             )
     private int linesToRemove = 200;
     
