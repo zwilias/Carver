@@ -19,7 +19,7 @@ public class Carve {
     private int[][] grayscale;
     private final Sobel sobel = new Sobel();
     private int[] toRemove;
-    private CumulativeImportance ci;
+    private CumulativeVerticalImportance cvi;
     
     // Params
     @Parameter(
@@ -161,12 +161,12 @@ public class Carve {
     
     // Step 2: Compute the Cumulative Importance
     private void cumulativeImportance() {
-        ci = new CumulativeImportance(grayscale);
+        cvi = new CumulativeVerticalImportance(grayscale);
     }
     
     // Step 3: Select a Line with Minimal Importance
     private void minimalImportance() {
-        this.toRemove = ci.getLine(ci.getLeastImportantLine());
+        this.toRemove = cvi.getLine(cvi.getLeastImportantLine());
     }
     
     // Step 4: Remove that line
