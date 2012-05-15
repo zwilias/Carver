@@ -59,6 +59,14 @@ public class Carve {
             linesToRemove--;
         }
         
+        while (horizontalLinesToRemove > 0) {
+            importance();
+            cumulativeHorizontalImportance();
+            minimalHorizontalImportance();
+            removeLeastHorizontalImportant();
+            horizontalLinesToRemove--;
+        }
+        
         img.setProcessor(imgProcessor);
         
         showOrSave();
@@ -85,9 +93,19 @@ public class Carve {
         cvi = new CumulativeVerticalImportance(grayscale);
     }
     
+    // Step 2b: Compute the Cumulative Horizontal Importance
+    private void cumulativeHorizontalImportance() {
+        chi = new CumulativeHorizontalImportance(grayscale);
+    }
+    
     // Step 3: Select a Line with Minimal Importance
     private void minimalImportance() {
         this.toRemove = cvi.getLine(cvi.getLeastImportantLine());
+    }
+    
+    // Step 3b: Select a horizontal Line with Minimal Importance
+    private void minimalHorizontalImportance() {
+        this.toRemove = chi.getLine(chi.getLeastImportantLine());
     }
     
     // Step 4: Remove that line
@@ -112,6 +130,36 @@ public class Carve {
                 }
                 
                 newIp.putPixel(x-shift, y, imgProcessor.getPixel(x, y));
+            }
+        }
+        
+        // TODO: Don't forget to uncomment this line
+        // it doesn't actually work without it, but it ruins the benching
+        imgProcessor = newIp;
+    }
+    
+    // Step 4b: Remove that line
+    private void removeLeastHorizontalImportant() {
+        ImageProcessor newIp;
+        
+        if (imgProcessor instanceof ColorProcessor) {
+            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
+        } else if (imgProcessor instanceof ByteProcessor) {
+            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+        
+        int shift;
+        for (int x = 0; x < imgProcessor.getWidth(); x++) {
+            shift = 0;
+            for (int y = 0; y < imgProcessor.getHeight(); y++) {
+                if (toRemove[x] == y) {
+                    shift = 1;
+                    continue;
+                }
+                
+                newIp.putPixel(x, y-shift, imgProcessor.getPixel(x, y));
             }
         }
         
