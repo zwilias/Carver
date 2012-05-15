@@ -1,8 +1,8 @@
 
 package khl.dip.assignment;
 
+import com.beust.jcommander.Parameter;
 import ij.ImagePlus;
-import ij.gui.ImageWindow;
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
@@ -15,12 +15,20 @@ public class Carve {
     private final Sobel sobel = new Sobel();
     private int[] toRemove;
     private CumulativeImportance ci;
+    
+    // Params
+    @Parameter(
+            names = {"-i", "--input"}, 
+            converter = ImagePlusConverter.class, 
+            required = true,
+            description = "Input file (must be an image)")
     private ImagePlus img;
     
-    public Carve(ImagePlus img) {
-        this.imgProcessor = img.getProcessor();
-        this.img = img;
-    }
+    @Parameter(
+            names = {"-l", "--lines"},
+            description = "Number of vertical lines to be removed. (default 200)"
+            )
+    private int linesToRemove = 200;
     
     public void benchmark(int iterations) {
         long startTime, endTime, diff;
@@ -108,8 +116,7 @@ public class Carve {
 
     }
     
-    public Carve(ImagePlus img, int linesToRemove) {
-        this.img = img;
+    public void run() {
         this.imgProcessor = img.getProcessor();
         
         while (linesToRemove > 0) {
@@ -120,7 +127,7 @@ public class Carve {
             linesToRemove--;
         }
         
-        this.img.setProcessor(imgProcessor);
+        img.setProcessor(imgProcessor);
     }
     
     public ImagePlus getImage() {
@@ -176,6 +183,6 @@ public class Carve {
         
         // TODO: Don't forget to uncomment this line
         // it doesn't actually work without it, but it ruins the benching
-        //imgProcessor = newIp;
+        imgProcessor = newIp;
     }
 }
