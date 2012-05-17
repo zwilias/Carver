@@ -21,6 +21,8 @@ public class Carve {
     private int[] toRemove;
     private CumulativeVerticalImportance cvi;
     private CumulativeHorizontalImportance chi;
+    private int[][] prioritizedPixels;
+    private int[][] protectedPixels;
     
     // Params
     @Parameter(
@@ -61,14 +63,15 @@ public class Carve {
     public void run() {
         this.imgProcessor = img.getProcessor();
         
-        while (linesToRemove > 0) {
-            importance();
-            cumulativeImportance();
-            minimalImportance();
-            removeLeastImportant();
-            linesToRemove--;
-        }
+        removeVerticalLines();
+        removeHorizontalLines();
         
+        img.setProcessor(imgProcessor);
+        
+        showOrSave();
+    }
+
+    private void removeHorizontalLines() {
         while (horizontalLinesToRemove > 0) {
             importance();
             cumulativeHorizontalImportance();
@@ -76,10 +79,16 @@ public class Carve {
             removeLeastHorizontalImportant();
             horizontalLinesToRemove--;
         }
-        
-        img.setProcessor(imgProcessor);
-        
-        showOrSave();
+    }
+
+    private void removeVerticalLines() {
+        while (linesToRemove > 0) {
+            importance();
+            cumulativeImportance();
+            minimalImportance();
+            removeLeastImportant();
+            linesToRemove--;
+        }
     }
     
     public ImagePlus getImage() {
