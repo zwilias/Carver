@@ -55,6 +55,12 @@ public class Carve {
             )
     private boolean addLines = false;
     
+    @Parameter(
+            names = {"-c", "--lines-per-batch"},
+            description = "How many lines will be removed in each batched action.\nSetting this to 1 will bypass batching."
+            )
+    private int linesPerTime = 30;
+    
     public boolean isShowUsage() {
         return this.showUsage;
     }
@@ -71,7 +77,20 @@ public class Carve {
     }
     
     private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
-        int linesPerTime = 30; // Let's limit the number of lines we do each iteration
+        if (linesPerTime > 1) {
+            batchAlterLines(linesToAlter, cumulativeImportance, lineChanger);
+        } else {
+            while (linesToAlter > 0) {
+               importance();
+                cumulativeImportance(cumulativeImportance);
+                int[][] toChange = minimalImportance(cumulativeImportance);
+                this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
+                linesToAlter--;
+            }
+        }
+    }
+
+    private void batchAlterLines(int linesToAlter, CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
         int linesDone = 0;
         while (linesDone < linesToAlter - linesToAlter%linesPerTime) {
             importance();
@@ -114,6 +133,10 @@ public class Carve {
     // Step 3: Select a Line with Minimal Importance
     private int[][] minimalImportance(CumulativeImportance cumulativeImportance, int count) {
         return cumulativeImportance.getLeastImportantLines(count);
+    }
+    
+    private int[][] minimalImportance(CumulativeImportance cumulativeImportance) {
+        return new int[][]{cumulativeImportance.getLine(cumulativeImportance.getLeastImportantLine())};
     }
     
     private void showOrSave() {
