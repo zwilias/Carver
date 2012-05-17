@@ -66,6 +66,8 @@ public class Carve {
     }
       
     public void run() {
+        checkParams();
+        
         this.imgProcessor = img.getProcessor();
         
         alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
@@ -150,6 +152,16 @@ public class Carve {
             } catch (IOException ex) {
                 throw new ParameterException("Could not write to " + outFile + ": " + ex.getMessage());
             }
+        }
+    }
+
+    private void checkParams() {
+        if (!addLines && (verticalLinesToAlter >= img.getWidth() || horizontalLinesToAlter >= img.getHeight())) {
+            throw new ParameterException("Can't make image that small, there won't be anything left.");
+        }
+        
+        if (verticalLinesToAlter < 0 || horizontalLinesToAlter < 0) {
+            throw new ParameterException("Can't alter a negative number of lines.");
         }
     }
 }
