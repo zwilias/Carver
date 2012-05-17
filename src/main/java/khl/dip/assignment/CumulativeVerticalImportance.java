@@ -83,7 +83,7 @@ public class CumulativeVerticalImportance extends CumulativeImportance {
         
         // First get all the cumulative importance things
         for (int i = 0; i < this.width; i++) {
-            cumuls.add(new SortableKeyValuePair(i, importanceGrid[i][this.width-1]));
+            cumuls.add(new SortableKeyValuePair(i, importanceGrid[this.height-1][i]));
         }
         
         Collections.sort(cumuls);
