@@ -73,7 +73,7 @@ public class Carve {
     private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
         int linesPerTime = 30; // Let's limit the number of lines we do each iteration
         int linesDone = 0;
-        while (linesDone < linesToAlter%linesPerTime) {
+        while (linesDone < linesToAlter - linesToAlter%linesPerTime) {
             importance();
             cumulativeImportance(cumulativeImportance);
             int[][] toChange = minimalImportance(cumulativeImportance, linesPerTime);
