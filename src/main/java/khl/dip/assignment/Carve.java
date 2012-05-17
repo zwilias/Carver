@@ -1,7 +1,6 @@
 
 package khl.dip.assignment;
 
-import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
@@ -16,77 +15,32 @@ public class Carve {
     private ImageProcessor imgProcessor;
     private int[][] grayscale;
     private final Sobel sobel = new Sobel();
+    private final CarveParams params;
     
-    // Params
-    @Parameter(
-            names = {"-i", "--input"}, 
-            converter = ImagePlusConverter.class, 
-            required = true,
-            description = "Input image")
-    private ImagePlus img;
-    
-    @Parameter(
-            names = {"-v", "--vertical"},
-            description = "Number of vertical lines to be removed or added."
-            )
-    private int verticalLinesToAlter = 0;
-    
-    @Parameter(
-            names = {"-o", "--output"},
-            description = "File to write the carved image to. (If not provided, image is displayed."
-            )
-    private String outFile;
-    
-    @Parameter(
-            names = {"-h", "--horizontal"},
-            description = "Number of horizontal lines to be removed or added."
-            )
-    private int horizontalLinesToAlter = 0;
-    
-    @Parameter(
-            names = {"--help"},
-            description = "Show usage."
-            )
-    private boolean showUsage;
-    
-    @Parameter(
-            names = {"-a", "--add-lines"},
-            description = "When set, the image will be enlarged, not shrinked."
-            )
-    private boolean addLines = false;
-    
-    @Parameter(
-            names = {"-c", "--lines-per-batch"},
-            description = "How many lines will be removed in each batched action.\nSetting this to 1 will bypass batching."
-            )
-    private int linesPerTime = 30;
-    
-    public boolean isShowUsage() {
-        return this.showUsage;
+    public Carve(CarveParams params) {
+        this.params = params;
     }
       
     public void run() {
-        checkParams();
+        this.imgProcessor = params.img.getProcessor();
         
-        this.imgProcessor = img.getProcessor();
+        alterLines(params.verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        alterLines(params.horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
         
-        alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
-        alterLines(horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
-        
-        img.setProcessor(imgProcessor);
+        params.img.setProcessor(imgProcessor);
         
         showOrSave();
     }
     
     private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
-        if (linesPerTime > 1) {
+        if (params.linesPerTime > 1) {
             batchAlterLines(linesToAlter, cumulativeImportance, lineChanger);
         } else {
             while (linesToAlter > 0) {
                importance();
                 cumulativeImportance(cumulativeImportance);
                 int[][] toChange = minimalImportance(cumulativeImportance);
-                this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
+                this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
                 linesToAlter--;
             }
         }
@@ -94,25 +48,25 @@ public class Carve {
 
     private void batchAlterLines(int linesToAlter, CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
         int linesDone = 0;
-        while (linesDone < linesToAlter - linesToAlter%linesPerTime) {
+        while (linesDone < linesToAlter - linesToAlter%params.linesPerTime) {
             importance();
             cumulativeImportance(cumulativeImportance);
-            int[][] toChange = minimalImportance(cumulativeImportance, linesPerTime);
-            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
-            linesDone += linesPerTime;
+            int[][] toChange = minimalImportance(cumulativeImportance, params.linesPerTime);
+            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
+            linesDone += params.linesPerTime;
         }
         
         // If we still have some lines left to handle, do it
-        if (linesToAlter%linesPerTime > 0) {
+        if (linesToAlter%params.linesPerTime > 0) {
             importance();
             cumulativeImportance(cumulativeImportance);
-            int[][] toChange = minimalImportance(cumulativeImportance, linesToAlter%linesPerTime);
-            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
+            int[][] toChange = minimalImportance(cumulativeImportance, linesToAlter%params.linesPerTime);
+            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
         }
     }
     
     public ImagePlus getImage() {
-        return this.img;
+        return params.img;
     }
     
     // Step 1: Compute the Importance
@@ -142,26 +96,16 @@ public class Carve {
     }
     
     private void showOrSave() {
-        if (outFile == null) {
-            ImageWindow window = new ImageWindow(img);
+        if (params.outFile == null) {
+            ImageWindow window = new ImageWindow(params.img);
             window.setVisible(true);
         } else {
             try {
-                String type = outFile.substring(outFile.lastIndexOf(".") + 1);
-                ImageIO.write(img.getBufferedImage(), type, new File(outFile));
+                String type = params.outFile.substring(params.outFile.lastIndexOf(".") + 1);
+                ImageIO.write(params.img.getBufferedImage(), type, new File(params.outFile));
             } catch (IOException ex) {
-                throw new ParameterException("Could not write to " + outFile + ": " + ex.getMessage());
+                throw new ParameterException("Could not write to " + params.outFile + ": " + ex.getMessage());
             }
-        }
-    }
-
-    private void checkParams() {
-        if (!addLines && (verticalLinesToAlter >= img.getWidth() || horizontalLinesToAlter >= img.getHeight())) {
-            throw new ParameterException("Can't make image that small, there won't be anything left.");
-        }
-        
-        if (verticalLinesToAlter < 0 || horizontalLinesToAlter < 0) {
-            throw new ParameterException("Can't alter a negative number of lines.");
         }
     }
 }

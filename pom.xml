@@ -36,7 +36,7 @@
       </descriptorRefs>
       <archive>
         <manifest>
-          <mainClass>khl.dip.assignment.App</mainClass>
+          <mainClass>khl.dip.assignment.Carver</mainClass>
         </manifest>
       </archive>
     </configuration>

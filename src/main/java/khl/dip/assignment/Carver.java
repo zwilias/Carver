@@ -7,25 +7,23 @@ import com.beust.jcommander.ParameterException;
  * Hello world!
  *
  */
-public class App 
+public class Carver 
 {
     public static void main(String[] args) { 
-        Carve carve = new Carve();
+        CarveParams carveParams = new CarveParams();
         JCommander jc = new JCommander();
-        jc.addObject(carve);
+        jc.addObject(carveParams);
         StringBuilder usage = new StringBuilder();
         jc.usage(usage);
         
         try {
             jc.parse(args);
-            if (carve.isShowUsage()) {
+            carveParams.checkParams();
+            if (carveParams.showUsage) {
                 System.out.println(usage);
             } else {
-                carve.run();
+                new Carve(carveParams).run();
             }
-            //Carve carve = new Carve(img);
-            //carve.benchmark(5000);
-            //carve.benchmarkImportance(500);
         } catch (ParameterException ex) {
             usage.insert(0, ex.getMessage() + "\n\n");
             System.out.println(usage);
