@@ -5,8 +5,6 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
-import ij.process.ByteProcessor;
-import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +16,6 @@ public class Carve {
     private ImageProcessor imgProcessor;
     private int[][] grayscale;
     private final Sobel sobel = new Sobel();
-    private int[] toRemove;
-    private CumulativeVerticalImportance cvi;
-    private CumulativeHorizontalImportance chi;
     private int[][] prioritizedPixels;
     private int[][] protectedPixels;
     
@@ -63,30 +58,20 @@ public class Carve {
     public void run() {
         this.imgProcessor = img.getProcessor();
         
-        removeVerticalLines();
-        removeHorizontalLines();
+        removeLines(linesToRemove, new VerticalLineRemover(), new CumulativeVerticalImportance());
+        removeLines(horizontalLinesToRemove, new HorizontalLineRemover(), new CumulativeHorizontalImportance());
         
         img.setProcessor(imgProcessor);
         
         showOrSave();
     }
-
-    private void removeHorizontalLines() {
-        while (horizontalLinesToRemove > 0) {
-            importance();
-            cumulativeHorizontalImportance();
-            minimalHorizontalImportance();
-            removeLeastHorizontalImportant();
-            horizontalLinesToRemove--;
-        }
-    }
-
-    private void removeVerticalLines() {
+    
+    private void removeLines(int linesToRemove, LineRemover lineRemover, CumulativeImportance cumulativeImportance) {
         while (linesToRemove > 0) {
             importance();
-            cumulativeImportance();
-            minimalImportance();
-            removeLeastImportant();
+            cumulativeImportance(cumulativeImportance);
+            int[] toRemove = minimalImportance(cumulativeImportance);
+            this.imgProcessor = lineRemover.removeLines(toRemove, imgProcessor);
             linesToRemove--;
         }
     }
@@ -108,83 +93,15 @@ public class Carve {
     }
     
     // Step 2: Compute the Cumulative Importance
-    private void cumulativeImportance() {
-        cvi = new CumulativeVerticalImportance(grayscale);
-    }
-    
-    // Step 2b: Compute the Cumulative Horizontal Importance
-    private void cumulativeHorizontalImportance() {
-        chi = new CumulativeHorizontalImportance(grayscale);
+    private void cumulativeImportance(CumulativeImportance cumulativeImportance) {
+        cumulativeImportance.applyTo(grayscale);
     }
     
     // Step 3: Select a Line with Minimal Importance
-    private void minimalImportance() {
-        this.toRemove = cvi.getLine(cvi.getLeastImportantLine());
+    private int[] minimalImportance(CumulativeImportance cumulativeImportance) {
+        return cumulativeImportance.getLine(cumulativeImportance.getLeastImportantLine());
     }
     
-    // Step 3b: Select a horizontal Line with Minimal Importance
-    private void minimalHorizontalImportance() {
-        this.toRemove = chi.getLine(chi.getLeastImportantLine());
-    }
-    
-    // Step 4: Remove that line
-    private void removeLeastImportant() {
-        ImageProcessor newIp;
-        
-        if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
-        } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
-        } else {
-            throw new UnsupportedOperationException();
-        }
-        
-        int shift;
-        for (int y = 0; y < imgProcessor.getHeight(); y++) {
-            shift = 0;
-            for (int x = 0; x < imgProcessor.getWidth(); x++) {
-                if (toRemove[y] == x) {
-                    shift = 1;
-                    continue;
-                }
-                
-                newIp.putPixel(x-shift, y, imgProcessor.getPixel(x, y));
-            }
-        }
-        
-        // TODO: Don't forget to uncomment this line
-        // it doesn't actually work without it, but it ruins the benching
-        imgProcessor = newIp;
-    }
-    
-    // Step 4b: Remove that line
-    private void removeLeastHorizontalImportant() {
-        ImageProcessor newIp;
-        
-        if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
-        } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
-        } else {
-            throw new UnsupportedOperationException();
-        }
-        
-        int shift;
-        for (int x = 0; x < imgProcessor.getWidth(); x++) {
-            shift = 0;
-            for (int y = 0; y < imgProcessor.getHeight(); y++) {
-                if (toRemove[x] == y) {
-                    shift = 1;
-                    continue;
-                }
-                
-                newIp.putPixel(x, y-shift, imgProcessor.getPixel(x, y));
-            }
-        }
-        
-        imgProcessor = newIp;
-    }
-
     private void showOrSave() {
         if (outFile == null) {
             ImageWindow window = new ImageWindow(img);

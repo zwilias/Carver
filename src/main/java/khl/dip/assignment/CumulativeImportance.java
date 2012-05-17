@@ -2,12 +2,12 @@
 package khl.dip.assignment;
 
 public abstract class CumulativeImportance {
-    protected final int[][] directions;
-    protected final int height;
-    protected final int[][] importanceGrid;
-    protected final int width;
+    protected int[][] directions;
+    protected int height;
+    protected int[][] importanceGrid;
+    protected int width;
     
-    public CumulativeImportance(final int[][] pixels) {
+    public void applyTo(final int[][] pixels) {
         this.width = pixels.length;
         this.height = pixels[0].length;
         

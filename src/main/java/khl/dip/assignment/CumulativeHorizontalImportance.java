@@ -2,10 +2,6 @@
 package khl.dip.assignment;
 
 public class CumulativeHorizontalImportance extends CumulativeImportance {
-    
-    public CumulativeHorizontalImportance(final int[][] pixels) {
-        super(pixels);
-    }
 
     @Override
     protected void populateDirections(final int[][] pixels) {
