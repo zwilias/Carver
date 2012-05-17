@@ -16,8 +16,6 @@ public class Carve {
     private ImageProcessor imgProcessor;
     private int[][] grayscale;
     private final Sobel sobel = new Sobel();
-    private int[][] prioritizedPixels;
-    private int[][] protectedPixels;
     
     // Params
     @Parameter(
@@ -29,7 +27,7 @@ public class Carve {
     
     @Parameter(
             names = {"-v", "--vertical"},
-            description = "Number of vertical lines to be removed."
+            description = "Number of vertical lines to be removed or added."
             )
     private int linesToRemove = 0;
     
@@ -41,7 +39,7 @@ public class Carve {
     
     @Parameter(
             names = {"-h", "--horizontal"},
-            description = "Number of horizontal lines to be removed."
+            description = "Number of horizontal lines to be removed or added."
             )
     private int horizontalLinesToRemove = 0;
     
