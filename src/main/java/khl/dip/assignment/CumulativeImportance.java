@@ -1,18 +1,21 @@
 
 package khl.dip.assignment;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public abstract class CumulativeImportance {
     protected int[][] directions;
     protected int height;
     protected int[][] importanceGrid;
     protected int width;
+    protected List<SortableKeyValuePair> importances;
     
     public void applyTo(final int[][] pixels) {
         this.width = pixels.length;
         this.height = pixels[0].length;
+        this.importances = new LinkedList<SortableKeyValuePair>();
         
-        // By saving these with the y as the first index, we can extract an entire
-        // line later on - easier that way.
         importanceGrid = new int[this.height][this.width];
         directions = new int[this.width][this.height];
         populateDirections(pixels);
@@ -62,6 +65,13 @@ public abstract class CumulativeImportance {
         
         return key;
     }
+    
+    /**
+     * Tries to find count non-overlapping lines of minimal importance
+     * @param count
+     * @return 
+     */
+    public abstract int[][] getLeastImportantLines(int count);
 
     /**
      * Calculates and returns the path that results in the cumulative importance
@@ -81,4 +91,27 @@ public abstract class CumulativeImportance {
      */
     protected abstract void populateInitialImportance(final int[][] pixels);
 
+    protected class SortableKeyValuePair implements Comparable<SortableKeyValuePair> {
+        private final int key;
+        private final int value;
+        
+        public SortableKeyValuePair(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+        
+        public int getKey() {
+            return this.key;
+        }
+        
+        public int getValue() {
+            return this.value;
+        }
+
+        @Override
+        public int compareTo(SortableKeyValuePair t) {
+            return this.value - t.value;
+        }
+        
+    }
 }

@@ -11,7 +11,7 @@ import ij.process.ImageProcessor;
  * @author ilias
  */
 public abstract class LineChanger {
-    public ImageProcessor changeLine(int[] toChange, ImageProcessor imageProcessor, boolean addLines) {
+    public ImageProcessor changeLine(int[][] toChange, ImageProcessor imageProcessor, boolean addLines) {
         if (addLines) {
             return addLine(toChange, imageProcessor);
         } else {
@@ -19,6 +19,6 @@ public abstract class LineChanger {
         }
     }
     
-    public abstract ImageProcessor addLine(int[] toAdd, ImageProcessor imageProcessor);
-    public abstract ImageProcessor removeLine(int[] toRemove, ImageProcessor imageProcessor);
+    public abstract ImageProcessor addLine(int[][] toAdd, ImageProcessor imageProcessor);
+    public abstract ImageProcessor removeLine(int[][] toRemove, ImageProcessor imageProcessor);
 }

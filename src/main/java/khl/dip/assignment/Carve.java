@@ -49,6 +49,10 @@ public class Carve {
             )
     private boolean showUsage;
     
+    @Parameter(
+            names = {"-a", "--add-lines"},
+            description = "When set, the image will be enlarged, not shrinked."
+            )
     private boolean addLines = false;
     
     public boolean isShowUsage() {
@@ -58,7 +62,7 @@ public class Carve {
     public void run() {
         this.imgProcessor = img.getProcessor();
         
-        alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        //alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
         alterLines(horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
         
         img.setProcessor(imgProcessor);
@@ -67,12 +71,22 @@ public class Carve {
     }
     
     private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
-        while (linesToAlter > 0) {
+        int linesPerTime = 30; // Let's limit the number of lines we do each iteration
+        int linesDone = 0;
+        while (linesDone < linesToAlter%linesPerTime) {
             importance();
             cumulativeImportance(cumulativeImportance);
-            int[] toChange = minimalImportance(cumulativeImportance);
+            int[][] toChange = minimalImportance(cumulativeImportance, linesPerTime);
             this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
-            linesToAlter--;
+            linesDone += linesPerTime;
+        }
+        
+        // If we still have some lines left to handle, do it
+        if (linesToAlter%linesPerTime > 0) {
+            importance();
+            cumulativeImportance(cumulativeImportance);
+            int[][] toChange = minimalImportance(cumulativeImportance, linesToAlter%linesPerTime);
+            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
         }
     }
     
@@ -98,8 +112,8 @@ public class Carve {
     }
     
     // Step 3: Select a Line with Minimal Importance
-    private int[] minimalImportance(CumulativeImportance cumulativeImportance) {
-        return cumulativeImportance.getLine(cumulativeImportance.getLeastImportantLine());
+    private int[][] minimalImportance(CumulativeImportance cumulativeImportance, int count) {
+        return cumulativeImportance.getLeastImportantLines(count);
     }
     
     private void showOrSave() {

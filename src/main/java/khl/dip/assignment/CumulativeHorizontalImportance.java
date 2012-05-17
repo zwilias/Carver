@@ -1,6 +1,9 @@
 
 package khl.dip.assignment;
 
+import java.util.Collections;
+import java.util.LinkedList;
+
 public class CumulativeHorizontalImportance extends CumulativeImportance {
 
     @Override
@@ -70,6 +73,67 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
         for (int x = result.length-1; x > 0; x--) {
             idx += directions[x][idx];
             result[x-1] = idx;
+        }
+        
+        return result;
+    }
+
+    @Override
+    public int[][] getLeastImportantLines(int count) {
+        int[][] result = new int[count][this.width];
+        int[][] usedMatrix = new int[this.width][this.height];
+        int[] tmp;
+        LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
+        
+        // First get all the cumulative importance things
+        for (int i = 0; i < this.height; i++) {
+            cumuls.add(new SortableKeyValuePair(i, importanceGrid[i][this.width-1]));
+        }
+        
+        Collections.sort(cumuls);
+        
+        tmp = getLine(cumuls.poll().getKey());
+        for (int x = this.width -1; x >= 0; x--) {
+            usedMatrix[x][tmp[x]] = 1;
+        }
+        
+        int i = 0;
+        result[i++] = tmp;
+        
+        while (i < count && cumuls.size() > 0) {
+            tmp = getLine(cumuls.poll().getKey());
+            
+            // Find out if this line crosses any other line already in the array
+            boolean conflict = false;
+            for (int x = this.width-1; !conflict && x >= 0; x--) {
+                conflict = usedMatrix[x][tmp[x]] == 1;
+            }
+            
+            // If it does, head on to the next line
+            if (conflict) {
+                continue;
+            }
+            
+            // otherwise, mark every cell this one uses as used
+            for (int x = this.width -1; x >= 0; x--) {
+                usedMatrix[x][tmp[x]] = 1;
+            }
+            
+            // and add it to the results array
+            result[i++] = tmp;
+        }
+        
+        // Instead of sorting the result, we'll recreate it, in a sorted manner.
+        // We already have all the information necessary for such a thing, so why
+        // not ;)
+        int[][] sorted = new int[result.length][result[0].length];
+        for (int x = 0; x < width; x++) {
+            int cnt = 0;
+            for (int y = 0; y < height; y++) {
+                if (usedMatrix[x][y] == 1) {
+                    sorted[cnt++][y] = x;
+                }
+            }
         }
         
         return result;

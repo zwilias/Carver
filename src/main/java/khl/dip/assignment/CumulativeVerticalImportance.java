@@ -70,4 +70,9 @@ public class CumulativeVerticalImportance extends CumulativeImportance {
         
         return result;
     }
+
+    @Override
+    public int[][] getLeastImportantLines(int count) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }

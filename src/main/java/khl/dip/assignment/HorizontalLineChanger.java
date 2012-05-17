@@ -8,18 +8,18 @@ import ij.process.ImageProcessor;
 public class HorizontalLineChanger extends LineChanger {
 
     @Override
-    public ImageProcessor addLine(int[] toAdd, ImageProcessor imageProcessor) {
+    public ImageProcessor addLine(int[][] toAdd, ImageProcessor imageProcessor) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
-    public ImageProcessor removeLine(int[] toRemove, ImageProcessor imgProcessor) {
+    public ImageProcessor removeLine(int[][] toRemove, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
         
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
+            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-toRemove.length);
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
+            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-toRemove.length);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -28,8 +28,8 @@ public class HorizontalLineChanger extends LineChanger {
         for (int x = 0; x < imgProcessor.getWidth(); x++) {
             shift = 0;
             for (int y = 0; y < imgProcessor.getHeight(); y++) {
-                if (toRemove[x] == y) {
-                    shift = 1;
+                if (shift < toRemove.length && toRemove[shift][x] == y) {
+                    shift++;
                     continue;
                 }
                 
