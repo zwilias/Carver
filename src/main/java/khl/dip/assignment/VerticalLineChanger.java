@@ -5,10 +5,14 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
-public class VerticalLineChanger implements LineChanger {
+public class VerticalLineChanger extends LineChanger {
+    @Override
+    public ImageProcessor addLine(int[] toAdd, ImageProcessor imageProcessor) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 
     @Override
-    public ImageProcessor changeLine(int[] toChange, ImageProcessor imgProcessor) {
+    public ImageProcessor removeLine(int[] toRemove, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
         
         if (imgProcessor instanceof ColorProcessor) {
@@ -23,7 +27,7 @@ public class VerticalLineChanger implements LineChanger {
         for (int y = 0; y < imgProcessor.getHeight(); y++) {
             shift = 0;
             for (int x = 0; x < imgProcessor.getWidth(); x++) {
-                if (toChange[y] == x) {
+                if (toRemove[y] == x) {
                     shift = 1;
                     continue;
                 }

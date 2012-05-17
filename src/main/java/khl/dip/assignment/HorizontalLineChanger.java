@@ -5,10 +5,15 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
-public class HorizontalLineChanger implements LineChanger {
+public class HorizontalLineChanger extends LineChanger {
 
     @Override
-    public ImageProcessor changeLine(int[] toChange, ImageProcessor imgProcessor) {
+    public ImageProcessor addLine(int[] toAdd, ImageProcessor imageProcessor) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ImageProcessor removeLine(int[] toRemove, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
         
         if (imgProcessor instanceof ColorProcessor) {
@@ -23,7 +28,7 @@ public class HorizontalLineChanger implements LineChanger {
         for (int x = 0; x < imgProcessor.getWidth(); x++) {
             shift = 0;
             for (int y = 0; y < imgProcessor.getHeight(); y++) {
-                if (toChange[x] == y) {
+                if (toRemove[x] == y) {
                     shift = 1;
                     continue;
                 }

@@ -49,6 +49,8 @@ public class Carve {
             )
     private boolean showUsage;
     
+    private boolean addLines = false;
+    
     public boolean isShowUsage() {
         return this.showUsage;
     }
@@ -69,7 +71,7 @@ public class Carve {
             importance();
             cumulativeImportance(cumulativeImportance);
             int[] toChange = minimalImportance(cumulativeImportance);
-            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor);
+            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, addLines);
             linesToAlter--;
         }
     }
