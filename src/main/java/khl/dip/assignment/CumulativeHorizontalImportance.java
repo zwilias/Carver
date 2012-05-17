@@ -131,7 +131,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
             int cnt = 0;
             for (int y = 0; y < height; y++) {
                 if (usedMatrix[x][y] == 1) {
-                    sorted[cnt++][y] = x;
+                    sorted[cnt++][x] = y;
                 }
             }
         }

@@ -127,7 +127,7 @@ public class CumulativeVerticalImportance extends CumulativeImportance {
             int cnt = 0;
             for (int x = 0; x < width; x++) {
                 if (usedMatrix[x][y] == 1) {
-                    sorted[cnt++][x] = y;
+                    sorted[cnt++][y] = x;
                 }
             }
         }
