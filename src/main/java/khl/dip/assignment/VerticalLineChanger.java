@@ -60,9 +60,9 @@ public class VerticalLineChanger extends LineChanger {
         ImageProcessor newIp;
         
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
+            newIp = new ColorProcessor(imgProcessor.getWidth()-toRemove.length, imgProcessor.getHeight());
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
+            newIp = new ByteProcessor(imgProcessor.getWidth()-toRemove.length, imgProcessor.getHeight());
         } else {
             throw new UnsupportedOperationException();
         }
@@ -71,7 +71,7 @@ public class VerticalLineChanger extends LineChanger {
         for (int y = 0; y < imgProcessor.getHeight(); y++) {
             shift = 0;
             for (int x = 0; x < imgProcessor.getWidth(); x++) {
-                if (toRemove[shift][y] == x) {
+                if (shift < toRemove.length && toRemove[shift][y] == x) {
                     shift += 1;
                     continue;
                 }

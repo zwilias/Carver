@@ -62,7 +62,7 @@ public class Carve {
     public void run() {
         this.imgProcessor = img.getProcessor();
         
-        //alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
         alterLines(horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
         
         img.setProcessor(imgProcessor);

@@ -1,6 +1,9 @@
 
 package khl.dip.assignment;
 
+import java.util.Collections;
+import java.util.LinkedList;
+
 public class CumulativeVerticalImportance extends CumulativeImportance {
 
     @Override
@@ -73,6 +76,62 @@ public class CumulativeVerticalImportance extends CumulativeImportance {
 
     @Override
     public int[][] getLeastImportantLines(int count) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        int[][] result = new int[count][this.height];
+        int[][] usedMatrix = new int[this.width][this.height];
+        int[] tmp;
+        LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
+        
+        // First get all the cumulative importance things
+        for (int i = 0; i < this.width; i++) {
+            cumuls.add(new SortableKeyValuePair(i, importanceGrid[i][this.width-1]));
+        }
+        
+        Collections.sort(cumuls);
+        
+        tmp = getLine(cumuls.poll().getKey());
+        for (int y = this.height -1; y >= 0; y--) {
+            usedMatrix[tmp[y]][y] = 1;
+        }
+        
+        int i = 0;
+        result[i++] = tmp;
+        
+        while (i < count && cumuls.size() > 0) {
+            tmp = getLine(cumuls.poll().getKey());
+            
+            // Find out if this line crosses any other line already in the array
+            boolean conflict = false;
+            for (int y = this.height-1; !conflict && y >= 0; y--) {
+                conflict = usedMatrix[tmp[y]][y] == 1;
+            }
+            
+            // If it does, head on to the next line
+            if (conflict) {
+                continue;
+            }
+            
+            // otherwise, mark every cell this one uses as used
+            for (int y = this.height -1; y >= 0; y--) {
+                usedMatrix[tmp[y]][y] = 1;
+            }
+            
+            // and add it to the results array
+            result[i++] = tmp;
+        }
+        
+        // Instead of sorting the result, we'll recreate it, in a sorted manner.
+        // We already have all the information necessary for such a thing, so why
+        // not ;)
+        int[][] sorted = new int[result.length][result[0].length];
+        for (int y = 0; y < height; y++) {
+            int cnt = 0;
+            for (int x = 0; x < width; x++) {
+                if (usedMatrix[x][y] == 1) {
+                    sorted[x][cnt++] = y;
+                }
+            }
+        }
+        
+        return result;
     }
 }
