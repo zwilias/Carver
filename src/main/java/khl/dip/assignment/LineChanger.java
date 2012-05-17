@@ -10,6 +10,6 @@ import ij.process.ImageProcessor;
  *
  * @author ilias
  */
-public interface LineRemover {
-    ImageProcessor removeLines(int[] toRemove, ImageProcessor imageProcessor);
+public interface LineChanger {
+    ImageProcessor changeLine(int[] toRemove, ImageProcessor imageProcessor);
 }

@@ -29,7 +29,7 @@ public class Carve {
             names = {"-v", "--vertical"},
             description = "Number of vertical lines to be removed or added."
             )
-    private int linesToRemove = 0;
+    private int verticalLinesToAlter = 0;
     
     @Parameter(
             names = {"-o", "--output"},
@@ -41,7 +41,7 @@ public class Carve {
             names = {"-h", "--horizontal"},
             description = "Number of horizontal lines to be removed or added."
             )
-    private int horizontalLinesToRemove = 0;
+    private int horizontalLinesToAlter = 0;
     
     @Parameter(
             names = {"--help"},
@@ -56,21 +56,21 @@ public class Carve {
     public void run() {
         this.imgProcessor = img.getProcessor();
         
-        removeLines(linesToRemove, new VerticalLineRemover(), new CumulativeVerticalImportance());
-        removeLines(horizontalLinesToRemove, new HorizontalLineRemover(), new CumulativeHorizontalImportance());
+        alterLines(verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        alterLines(horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
         
         img.setProcessor(imgProcessor);
         
         showOrSave();
     }
     
-    private void removeLines(int linesToRemove, LineRemover lineRemover, CumulativeImportance cumulativeImportance) {
-        while (linesToRemove > 0) {
+    private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
+        while (linesToAlter > 0) {
             importance();
             cumulativeImportance(cumulativeImportance);
-            int[] toRemove = minimalImportance(cumulativeImportance);
-            this.imgProcessor = lineRemover.removeLines(toRemove, imgProcessor);
-            linesToRemove--;
+            int[] toChange = minimalImportance(cumulativeImportance);
+            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor);
+            linesToAlter--;
         }
     }
     

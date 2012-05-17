@@ -5,30 +5,30 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
-public class VerticalLineRemover implements LineRemover {
+public class HorizontalLineChanger implements LineChanger {
 
     @Override
-    public ImageProcessor removeLines(int[] toRemove, ImageProcessor imgProcessor) {
+    public ImageProcessor changeLine(int[] toChange, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
         
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
+            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth()-1, imgProcessor.getHeight());
+            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-1);
         } else {
             throw new UnsupportedOperationException();
         }
         
         int shift;
-        for (int y = 0; y < imgProcessor.getHeight(); y++) {
+        for (int x = 0; x < imgProcessor.getWidth(); x++) {
             shift = 0;
-            for (int x = 0; x < imgProcessor.getWidth(); x++) {
-                if (toRemove[y] == x) {
+            for (int y = 0; y < imgProcessor.getHeight(); y++) {
+                if (toChange[x] == y) {
                     shift = 1;
                     continue;
                 }
                 
-                newIp.putPixel(x-shift, y, imgProcessor.getPixel(x, y));
+                newIp.putPixel(x, y-shift, imgProcessor.getPixel(x, y));
             }
         }
         
