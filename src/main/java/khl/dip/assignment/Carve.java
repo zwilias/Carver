@@ -182,8 +182,6 @@ public class Carve {
             }
         }
         
-        // TODO: Don't forget to uncomment this line
-        // it doesn't actually work without it, but it ruins the benching
         imgProcessor = newIp;
     }
 
