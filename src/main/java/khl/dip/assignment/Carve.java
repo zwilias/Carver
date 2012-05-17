@@ -31,10 +31,10 @@ public class Carve {
     private ImagePlus img;
     
     @Parameter(
-            names = {"-l", "--lines"},
+            names = {"-v", "--vertical"},
             description = "Number of vertical lines to be removed."
             )
-    private int linesToRemove = 200;
+    private int linesToRemove = 0;
     
     @Parameter(
             names = {"-o", "--output"},
@@ -47,6 +47,16 @@ public class Carve {
             description = "Number of horizontal lines to be removed."
             )
     private int horizontalLinesToRemove = 0;
+    
+    @Parameter(
+            names = {"--help"},
+            description = "Show usage."
+            )
+    private boolean showUsage;
+    
+    public boolean isShowUsage() {
+        return this.showUsage;
+    }
       
     public void run() {
         this.imgProcessor = img.getProcessor();

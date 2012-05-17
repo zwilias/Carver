@@ -18,7 +18,11 @@ public class App
         
         try {
             jc.parse(args);
-            carve.run();
+            if (carve.isShowUsage()) {
+                System.out.println(usage);
+            } else {
+                carve.run();
+            }
             //Carve carve = new Carve(img);
             //carve.benchmark(5000);
             //carve.benchmarkImportance(500);
