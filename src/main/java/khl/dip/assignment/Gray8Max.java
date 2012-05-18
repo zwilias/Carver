@@ -13,11 +13,11 @@ public class Gray8Max extends Gray8NeighborhoodOperation {
             for (int j = -1; j <= 1; j++) {
                 int xi = x + i;
                 int yj = y + j;
-                
-                if (xi <  0 || yj < 0 || xi >= width || yj >= height) {
+
+                if (xi < 0 || yj < 0 || xi >= width || yj >= height) {
                     continue;
                 }
-                
+
                 if (pixels[xi][yj] > max) {
                     max = pixels[xi][yj];
                 }

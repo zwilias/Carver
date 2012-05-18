@@ -1,18 +1,18 @@
-
 package khl.dip.assignment;
 
 import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
-
 public class Desaturate {
-    /* In this case, we apply it on a duplicate and return it instead 
-     * of applying it in-place. Keep this in mind.
+    /*
+     * In this case, we apply it on a duplicate and return it instead of
+     * applying it in-place. Keep this in mind.
      */
+
     public int[][] applyTo(ImageProcessor ip) {
         final int[][] result = new int[ip.getWidth()][ip.getHeight()];
-        
+
         if (ip instanceof ColorProcessor) {
             for (int x = 0; x < ip.getWidth(); x++) {
                 for (int y = 0; y < ip.getHeight(); y++) {
@@ -28,7 +28,7 @@ public class Desaturate {
         } else {
             throw new UnsupportedOperationException();
         }
-        
+
         return result;
     }
 

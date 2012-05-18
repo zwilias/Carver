@@ -1,4 +1,3 @@
-
 package khl.dip.assignment;
 
 import com.beust.jcommander.IStringConverter;
@@ -10,5 +9,4 @@ public class ImagePlusConverter implements IStringConverter<ImagePlus> {
     public ImagePlus convert(String string) {
         return new ImagePlus(string);
     }
-
 }

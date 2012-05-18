@@ -1,4 +1,3 @@
-
 package khl.dip.assignment;
 
 import ij.process.ByteProcessor;
@@ -15,15 +14,15 @@ public class HorizontalLineChanger extends LineChanger {
     @Override
     public ImageProcessor removeLine(int[][] toRemove, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
-        
+
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-toRemove.length);
+            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight() - toRemove.length);
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight()-toRemove.length);
+            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight() - toRemove.length);
         } else {
             throw new UnsupportedOperationException();
         }
-        
+
         int shift;
         for (int x = 0; x < imgProcessor.getWidth(); x++) {
             shift = 0;
@@ -32,12 +31,11 @@ public class HorizontalLineChanger extends LineChanger {
                     shift++;
                     continue;
                 }
-                
-                newIp.putPixel(x, y-shift, imgProcessor.getPixel(x, y));
+
+                newIp.putPixel(x, y - shift, imgProcessor.getPixel(x, y));
             }
         }
-        
+
         return newIp;
     }
-
 }

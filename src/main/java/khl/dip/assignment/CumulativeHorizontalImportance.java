@@ -1,4 +1,3 @@
-
 package khl.dip.assignment;
 
 import java.util.Collections;
@@ -9,7 +8,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
     @Override
     protected void populateDirections(final int[][] pixels) {
         populateInitialImportance(pixels);
-        
+
         // Run through the rest of the lines, figuring out their minimal
         // cumulative importance along the way.
         for (int x = 1; x < this.width; x++) {
@@ -26,55 +25,55 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
             importanceGrid[y][0] = pixels[0][y];
         }
     }
-    
+
     @Override
     protected int findMinimalNeighbor(int x, int y, int direction) {
-        return importanceGrid[y+direction][x-1];
+        return importanceGrid[y + direction][x - 1];
     }
 
     @Override
     protected int getDirection(int x, int y) {
         int direction = 0;
         if (y == 0) {
-            if (importanceGrid[y][x-1] > importanceGrid[y+1][x-1]) {
+            if (importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
                 direction = 1;
             }
-        } else if (y == this.height-1) {
-            if (importanceGrid[y-1][x-1] < importanceGrid[y][x-1]) {
+        } else if (y == this.height - 1) {
+            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1]) {
                 direction = -1;
             }
         } else {
-            if (importanceGrid[y-1][x-1] < importanceGrid[y][x-1] && importanceGrid[y][x-1] <= importanceGrid[y+1][x-1]) {
+            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1] && importanceGrid[y][x - 1] <= importanceGrid[y + 1][x - 1]) {
                 // up smallest
                 direction = -1;
-            } else if (importanceGrid[y-1][x-1] >= importanceGrid[y][x-1] && importanceGrid[y][x-1] > importanceGrid[y+1][x-1]) {
+            } else if (importanceGrid[y - 1][x - 1] >= importanceGrid[y][x - 1] && importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
                 // down smallest
                 direction = 1;
             }
         }
         return direction;
     }
-    
+
     @Override
     public int[] getCumulativeImportance() {
         int[] result = new int[this.height];
         for (int i = 0; i < this.height; i++) {
-            result[i] = importanceGrid[i][this.width-1];
+            result[i] = importanceGrid[i][this.width - 1];
         }
         return result;
     }
-    
+
     @Override
     public int[] getLine(int idx) {
         final int[] result = new int[this.width];
-        
-        result[result.length-1] = idx;
-        
-        for (int x = result.length-1; x > 0; x--) {
+
+        result[result.length - 1] = idx;
+
+        for (int x = result.length - 1; x > 0; x--) {
             idx += directions[x][idx];
-            result[x-1] = idx;
+            result[x - 1] = idx;
         }
-        
+
         return result;
     }
 
@@ -84,45 +83,45 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
         int[][] usedMatrix = new int[this.width][this.height];
         int[] tmp;
         LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
-        
+
         // First get all the cumulative importance things
         for (int i = 0; i < this.height; i++) {
-            cumuls.add(new SortableKeyValuePair(i, importanceGrid[i][this.width-1]));
+            cumuls.add(new SortableKeyValuePair(i, importanceGrid[i][this.width - 1]));
         }
-        
+
         Collections.sort(cumuls);
-        
+
         tmp = getLine(cumuls.poll().getKey());
-        for (int x = this.width -1; x >= 0; x--) {
+        for (int x = this.width - 1; x >= 0; x--) {
             usedMatrix[x][tmp[x]] = 1;
         }
-        
+
         int i = 0;
         result[i++] = tmp;
-        
+
         while (i < count && cumuls.size() > 0) {
             tmp = getLine(cumuls.poll().getKey());
-            
+
             // Find out if this line crosses any other line already in the array
             boolean conflict = false;
-            for (int x = this.width-1; !conflict && x >= 0; x--) {
+            for (int x = this.width - 1; !conflict && x >= 0; x--) {
                 conflict = usedMatrix[x][tmp[x]] == 1;
             }
-            
+
             // If it does, head on to the next line
             if (conflict) {
                 continue;
             }
-            
+
             // otherwise, mark every cell this one uses as used
-            for (int x = this.width -1; x >= 0; x--) {
+            for (int x = this.width - 1; x >= 0; x--) {
                 usedMatrix[x][tmp[x]] = 1;
             }
-            
+
             // and add it to the results array
             result[i++] = tmp;
         }
-        
+
         // Instead of sorting the result, we'll recreate it, in a sorted manner.
         // We already have all the information necessary for such a thing, so why
         // not ;)
@@ -135,7 +134,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
                 }
             }
         }
-        
+
         return result;
     }
 }
