@@ -82,14 +82,4 @@ public class Point {
         hash = 89 * hash + this.y;
         return hash;
     }
-    
-    public static void main(String[] args) {
-        for (Point p : new Point(0, 0).getPointsOnLineTo(new Point(0, 1))) {
-            System.out.println(p.toString());
-        }
-    }
-    
-    public String toString() {
-        return x + "x" + y;
-    }
 }
