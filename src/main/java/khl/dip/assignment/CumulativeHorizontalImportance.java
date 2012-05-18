@@ -79,7 +79,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
 
     @Override
     public int[][] getLeastImportantLines(int count) {
-        int[][] result = new int[count][this.width];
+        int[][] sorted = new int[count][this.width];
         int[][] usedMatrix = new int[this.width][this.height];
         int[] tmp;
         LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
@@ -96,8 +96,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
             usedMatrix[x][tmp[x]] = 1;
         }
 
-        int i = 0;
-        result[i++] = tmp;
+        int i = 1;
 
         while (i < count && cumuls.size() > 0) {
             tmp = getLine(cumuls.poll().getKey());
@@ -118,14 +117,10 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
                 usedMatrix[x][tmp[x]] = 1;
             }
 
-            // and add it to the results array
-            result[i++] = tmp;
+            i += 1;
         }
 
-        // Instead of sorting the result, we'll recreate it, in a sorted manner.
-        // We already have all the information necessary for such a thing, so why
-        // not ;)
-        int[][] sorted = new int[result.length][result[0].length];
+        // Let's finish up by creating our actual result
         for (int x = 0; x < width; x++) {
             int cnt = 0;
             for (int y = 0; y < height; y++) {
@@ -135,6 +130,6 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
             }
         }
 
-        return result;
+        return sorted;
     }
 }

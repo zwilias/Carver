@@ -2,6 +2,7 @@ package khl.dip.assignment;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.converters.CommaParameterSplitter;
 import com.beust.jcommander.validators.PositiveInteger;
 import ij.ImagePlus;
 import java.util.ArrayList;
@@ -38,12 +39,12 @@ public class CarveParams {
     public boolean addLines = false;
     
     @Parameter(names = {"-c", "--lines-per-batch"},
-               description = "How many lines will be removed in each batched action.\nSetting this to 1 will bypass batching.")
+               description = "How many lines will be removed in each batched action. Setting this to 1 will bypass batching.")
     public int linesPerTime = 30;
     
     @Parameter(names = {"-p", "--prioritize"},
                description = "Comma-separated list of pixels to prioritize. Each pixel is in the format of XxY, with X its x-coordinate, 0-indexed on the left and Y its y-coordinate, 0-indexed on the top. These will be processed in the order in which they're supplied to create a shape with the supplied pixels functioning as corner-points.",
-               variableArity = true)
+               splitter = CommaParameterSplitter.class)
     private List<String> prioritizedList = new ArrayList<String>();
     
     public int[][] prioritized;
@@ -107,6 +108,13 @@ public class CarveParams {
         int[][] pixelMatrix = createShape(width, height);
         
         markEdges(corners, pixelMatrix);
+        
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                System.out.print(pixelMatrix[x][y]);
+            }
+            System.out.print("\n");
+        }
         
         return pixelMatrix;
     }

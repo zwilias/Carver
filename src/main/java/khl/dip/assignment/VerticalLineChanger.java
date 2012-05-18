@@ -61,11 +61,12 @@ public class VerticalLineChanger extends LineChanger {
             for (int x = 0; x < imgProcessor.getWidth(); x++) {
                 if (shift < toRemove.length && toRemove[shift][y] == x) {
                     shift += 1;
-                    continue;
+                    // skip line, we're removing it
+                    
+                } else {
+                    updatedPrioritized[x-shift][y] = prioritizedPixels[x][y]; 
+                    newIp.putPixel(x - shift, y, imgProcessor.getPixel(x, y));
                 }
-
-                updatedPrioritized[x-shift][y] = prioritizedPixels[x][y];
-                newIp.putPixel(x - shift, y, imgProcessor.getPixel(x, y));
             }
         }
 
