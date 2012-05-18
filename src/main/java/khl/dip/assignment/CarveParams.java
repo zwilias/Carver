@@ -53,17 +53,19 @@ public class CarveParams {
             throw new ParameterException("Can't make image that small, there won't be anything left.");
         }
 
-        prioritized = createPixelMatrix(prioritizedList);
+        prioritized = createPixelMatrix(prioritizedList, img.getWidth(), img.getHeight());
     }
 
     public void fillShape(int[][] pixelMatrix, ArrayList<Point> corners) {
+        int width = pixelMatrix.length;
+        int height = pixelMatrix[0].length;
         // Now fill up the gaps
         boolean fill = false;
-        for (int x = 0; x < img.getWidth(); x++) {
-            for (int y = 0; y < img.getHeight(); y++) {
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
                 // if point is marked and is not a corner-point nor part of a vertical line, switch filling mode
                 if (pixelMatrix[x][y] == 1) {
-                    if (!corners.contains(new Point(x, y)) && !(y < img.getHeight()-1 && pixelMatrix[x][y+1] == 1)) {
+                    if (!corners.contains(new Point(x, y)) && !(y+1 < height && pixelMatrix[x][y+1] == 1)) {
                         fill = !fill;
                     }
                 } else {
@@ -83,16 +85,16 @@ public class CarveParams {
         }
     }
 
-    private int[][] createPixelMatrix(List<String> coordinateList) {
+    private int[][] createPixelMatrix(List<String> coordinateList, int width, int height) {
         if (coordinateList.size() > 0) {
-            ArrayList<Point> corners = parseCorners(coordinateList);
-            return createShape(corners);
+            ArrayList<Point> corners = parseCorners(coordinateList, width, height);
+            return createShape(corners, width, height);
         } else {
-            return createShape();
+            return createShape(width, height);
         }
     }
 
-    public ArrayList<Point> parseCorners(List<String> coordinateList) throws ParameterException {
+    public ArrayList<Point> parseCorners(List<String> coordinateList, int width, int height) throws ParameterException {
         ArrayList<Point> corners = new ArrayList<Point>(coordinateList.size());
         for (String param : coordinateList) {
             String[] coordinates = param.split("x");
@@ -104,7 +106,7 @@ public class CarveParams {
                 int x = Integer.parseInt(coordinates[0]);
                 int y = Integer.parseInt(coordinates[1]);
                 
-                if (x > img.getWidth() || y > img.getHeight()) {
+                if (x > width || y > height) {
                     throw new ParameterException("Coordinate '" + param + "' points to a pixel outside the current image");
                 }
 
@@ -116,8 +118,8 @@ public class CarveParams {
         return corners;
     }
 
-    public int[][] createShape(ArrayList<Point> corners) {
-        int[][] pixelMatrix = createShape();
+    public int[][] createShape(ArrayList<Point> corners, int width, int height) {
+        int[][] pixelMatrix = createShape(width, height);
         
         markEdges(corners, pixelMatrix);
         fillShape(pixelMatrix, corners);
@@ -125,7 +127,7 @@ public class CarveParams {
         return pixelMatrix;
     }
     
-    public int[][] createShape() {
-        return new int[img.getWidth()][img.getHeight()];
+    public int[][] createShape(int width, int height) {
+        return new int[width][height];
     }
 }
