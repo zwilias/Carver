@@ -52,7 +52,15 @@
 
         </plugins>
     </build>
-    <properties>
+  <repositories>
+    <repository>
+      <url>http://repo1.maven.org/maven2/</url>
+      <id>junit_4</id>
+      <layout>default</layout>
+      <name>Repository for library Library[junit_4]</name>
+    </repository>
+  </repositories>
+  <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -66,6 +74,12 @@
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
       <version>1.25</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.10</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

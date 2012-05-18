@@ -56,42 +56,27 @@ public class CarveParams {
         prioritized = createPixelMatrix(prioritizedList, img.getWidth(), img.getHeight());
     }
 
-    public void fillShape(int[][] pixelMatrix, ArrayList<Point> corners) {
-        int width = pixelMatrix.length;
-        int height = pixelMatrix[0].length;
-        // Now fill up the gaps
-        boolean fill = false;
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                // if point is marked and is not a corner-point nor part of a vertical line, switch filling mode
-                if (pixelMatrix[x][y] == 1) {
-                    if (!corners.contains(new Point(x, y)) && !(y+1 < height && pixelMatrix[x][y+1] == 1)) {
-                        fill = !fill;
-                    }
-                } else {
-                    pixelMatrix[x][y] = fill ? 1 : 0;
-                }
-            }
-        }
-    }
-
-    public void markEdges(ArrayList<Point> corners, int[][] pixelMatrix) {
+    public int[][] markEdges(List<Point> corners, int[][] pixelMatrix) {
         Point previous = corners.get(corners.size()-1);
         for (Point current : corners) {
-            pixelMatrix[current.getX()][current.getY()] = 1;
             for (Point p : current.getPointsOnLineTo(previous)) {
                 pixelMatrix[p.getX()][p.getY()] = 1;
             }
+            previous = current;
         }
+        
+        return pixelMatrix;
     }
 
     private int[][] createPixelMatrix(List<String> coordinateList, int width, int height) {
+        int[][] pixelMatrix;
         if (coordinateList.size() > 0) {
             ArrayList<Point> corners = parseCorners(coordinateList, width, height);
-            return createShape(corners, width, height);
+            pixelMatrix = markEdges(corners, createShape(width, height));
         } else {
-            return createShape(width, height);
+            pixelMatrix = createShape(width, height);
         }
+        return pixelMatrix;
     }
 
     public ArrayList<Point> parseCorners(List<String> coordinateList, int width, int height) throws ParameterException {
@@ -118,11 +103,10 @@ public class CarveParams {
         return corners;
     }
 
-    public int[][] createShape(ArrayList<Point> corners, int width, int height) {
+    public int[][] createShape(List<Point> corners, int width, int height) {
         int[][] pixelMatrix = createShape(width, height);
         
         markEdges(corners, pixelMatrix);
-        fillShape(pixelMatrix, corners);
         
         return pixelMatrix;
     }

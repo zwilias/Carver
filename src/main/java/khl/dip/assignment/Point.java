@@ -24,6 +24,7 @@ public class Point {
     // Thank you, wikipedia.
     public List<Point> getPointsOnLineTo(Point otherPoint) {
         List<Point> result = new ArrayList<Point>();
+        result.add(this);
         
         int x0 = this.getX();
         int y0 = this.getY();
@@ -82,5 +83,13 @@ public class Point {
         return hash;
     }
     
+    public static void main(String[] args) {
+        for (Point p : new Point(0, 0).getPointsOnLineTo(new Point(0, 1))) {
+            System.out.println(p.toString());
+        }
+    }
     
+    public String toString() {
+        return x + "x" + y;
+    }
 }
