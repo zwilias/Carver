@@ -6,6 +6,7 @@ import ij.process.ImageProcessor;
 
 public class HorizontalLineChanger extends LineChanger {
 
+    //TODO: implement this
     @Override
     public ImageProcessor addLine(int[][] toAdd, ImageProcessor imageProcessor) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -13,12 +14,15 @@ public class HorizontalLineChanger extends LineChanger {
 
     @Override
     public ImageProcessor removeLine(int[][] toRemove, ImageProcessor imgProcessor) {
+        int width = imgProcessor.getWidth();
+        int height = imgProcessor.getHeight() - toRemove.length;
         ImageProcessor newIp;
+        int[][] updatedPrioritized = new int[width][height];
 
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth(), imgProcessor.getHeight() - toRemove.length);
+            newIp = new ColorProcessor(width, height);
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth(), imgProcessor.getHeight() - toRemove.length);
+            newIp = new ByteProcessor(width, height);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -32,6 +36,7 @@ public class HorizontalLineChanger extends LineChanger {
                     continue;
                 }
 
+                updatedPrioritized[x][y-shift] = prioritizedPixels[x][y];
                 newIp.putPixel(x, y - shift, imgProcessor.getPixel(x, y));
             }
         }

@@ -6,6 +6,7 @@ import ij.process.ImageProcessor;
 
 public class VerticalLineChanger extends LineChanger {
 
+    // TODO: actually implement this - current code is wonky at best
     @Override
     public ImageProcessor addLine(int[][] toAdd, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
@@ -39,30 +40,17 @@ public class VerticalLineChanger extends LineChanger {
         return newIp;
     }
 
-    private int average(int color1, int color2, boolean gray8) {
-        int result;
-
-        if (gray8) {
-            result = (color1 + color2) / 2;
-        } else {
-            int r = (((color1 & 0xff0000) >> 16) + ((color2 & 0xff0000) >> 16)) / 2;
-            int g = (((color1 & 0xff00) >> 8) + ((color2 & 0xff00) >> 8)) / 2;
-            int b = ((color1 & 0xff) + (color2 & 0xff)) / 2;
-
-            result = r << 16 | g << 8 | b;
-        }
-
-        return result;
-    }
-
     @Override
     public ImageProcessor removeLine(int[][] toRemove, ImageProcessor imgProcessor) {
         ImageProcessor newIp;
+        int width = imgProcessor.getWidth() - toRemove.length;
+        int height = imgProcessor.getHeight();
+        int[][] updatedPrioritized = new int[width][height];
 
         if (imgProcessor instanceof ColorProcessor) {
-            newIp = new ColorProcessor(imgProcessor.getWidth() - toRemove.length, imgProcessor.getHeight());
+            newIp = new ColorProcessor(width, height);
         } else if (imgProcessor instanceof ByteProcessor) {
-            newIp = new ByteProcessor(imgProcessor.getWidth() - toRemove.length, imgProcessor.getHeight());
+            newIp = new ByteProcessor(width, height);
         } else {
             throw new UnsupportedOperationException();
         }
@@ -76,10 +64,12 @@ public class VerticalLineChanger extends LineChanger {
                     continue;
                 }
 
+                updatedPrioritized[x-shift][y] = prioritizedPixels[x][y];
                 newIp.putPixel(x - shift, y, imgProcessor.getPixel(x, y));
             }
         }
 
+        this.prioritizedPixels = updatedPrioritized;
         return newIp;
     }
 }

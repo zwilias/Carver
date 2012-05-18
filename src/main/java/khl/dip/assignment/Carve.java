@@ -10,6 +10,7 @@ import javax.imageio.ImageIO;
 
 public class Carve {
 
+    private static final int PRIOR_PIXEL = 0;
     private final Desaturate desaturate = new Desaturate();
     private final Gray8Max grayMax = new Gray8Max();
     private ImageProcessor imgProcessor;
@@ -37,32 +38,39 @@ public class Carve {
             batchAlterLines(linesToAlter, cumulativeImportance, lineChanger);
         } else {
             while (linesToAlter > 0) {
-                importance();
-                cumulativeImportance(cumulativeImportance);
-                int[][] toChange = minimalImportance(cumulativeImportance);
-                this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
+                execAlter(cumulativeImportance, lineChanger);
                 linesToAlter--;
             }
         }
     }
 
+    private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger, int numLines) {
+        importance();
+        cumulativeImportance(cumulativeImportance);
+        int[][] toChange = minimalImportance(cumulativeImportance, numLines);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritized);
+        params.prioritized = lineChanger.prioritizedPixels;
+    }
+
+    private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
+        importance();
+        cumulativeImportance(cumulativeImportance);
+        int[][] toChange = minimalImportance(cumulativeImportance);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritized);
+        params.prioritized = lineChanger.prioritizedPixels;
+    }
+
     private void batchAlterLines(int linesToAlter, CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
         int linesDone = 0;
         while (linesDone < linesToAlter - linesToAlter % params.linesPerTime) {
-            importance();
-            cumulativeImportance(cumulativeImportance);
-            int[][] toChange = minimalImportance(cumulativeImportance, params.linesPerTime);
-            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
+            execAlter(cumulativeImportance, lineChanger, params.linesPerTime);
             linesDone += params.linesPerTime;
         }
 
         // If we still have some lines left to handle, do it
         if (linesToAlter % params.linesPerTime > 0) {
-            importance();
-            cumulativeImportance(cumulativeImportance);
-            int[][] toChange = minimalImportance(cumulativeImportance, linesToAlter % params.linesPerTime);
-            this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines);
-        }
+            execAlter(cumulativeImportance, lineChanger, linesToAlter % params.linesPerTime);
+       }
     }
 
     public ImagePlus getImage() {
@@ -79,6 +87,15 @@ public class Carve {
 
         // Apply a 3x3 maximum filter to spread the influence of edges to nearby pixels. 
         this.grayscale = grayMax.applyTo(grayscale);
+        
+        // Overlay the prioritized pixels matrix - i.e. loop over the entire thing
+        for (int x = 0; x < grayscale.length; x++) {
+            for (int y = 0; y < grayscale[0].length; y++) {
+                grayscale[x][y] = params.prioritized[x][y] == 1
+                        ? PRIOR_PIXEL
+                        : grayscale[x][y];
+            }
+        }
     }
 
     // Step 2: Compute the Cumulative Importance
