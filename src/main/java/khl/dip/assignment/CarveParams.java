@@ -66,14 +66,14 @@ public class CarveParams {
     }
 
     public boolean[][] markEdges(List<Point> corners, boolean[][] pixelMatrix) {
-        Point previous = corners.get(corners.size()-1);
+        Point previous = corners.get(corners.size() - 1);
         for (Point current : corners) {
             for (Point p : current.getPointsOnLineTo(previous)) {
                 pixelMatrix[p.getX()][p.getY()] = true;
             }
             previous = current;
         }
-        
+
         return pixelMatrix;
     }
 
@@ -88,18 +88,19 @@ public class CarveParams {
         return pixelMatrix;
     }
 
-    public ArrayList<Point> parseCorners(List<String> coordinateList, int width, int height) throws ParameterException {
+    public ArrayList<Point> parseCorners(List<String> coordinateList, int width, int height) throws
+            ParameterException {
         ArrayList<Point> corners = new ArrayList<Point>(coordinateList.size());
         for (String param : coordinateList) {
             String[] coordinates = param.split("x");
             if (coordinates.length != 2) {
                 throw new ParameterException("Coordinate '" + param + "' is not valid.");
             }
-            
+
             try {
                 int x = Integer.parseInt(coordinates[0]);
                 int y = Integer.parseInt(coordinates[1]);
-                
+
                 if (x > width || y > height) {
                     throw new ParameterException("Coordinate '" + param + "' points to a pixel outside the current image");
                 }
@@ -111,7 +112,7 @@ public class CarveParams {
         }
         return corners;
     }
-    
+
     // TODO: change this to first find a pixel that's IN the shape, then work from there
     // right now it's impossible to determine whether we're actually in the shape, there'
     // too many border-cases (got it?)
@@ -122,7 +123,7 @@ public class CarveParams {
             for (int x = 0; x < pixelMatrix.length; x++) {
                 if (pixelMatrix[x][y]) {
                     if (!corners.contains(new Point(x, y))) {
-                        if (x > 0 && pixelMatrix[x-1][y] && x+1 < pixelMatrix.length && pixelMatrix[x+1][y]) {
+                        if (x > 0 && pixelMatrix[x - 1][y] && x + 1 < pixelMatrix.length && pixelMatrix[x + 1][y]) {
                             fillMode = false;
                         } else {
                             fillMode = !fillMode;
@@ -133,27 +134,27 @@ public class CarveParams {
                 }
             }
         }
-        
+
         return pixelMatrix;
     }
-    
+
     public boolean[][] createShape(int width, int height) {
         return new boolean[width][height];
     }
-    
+
     public static void main(String[] args) {
         CarveParams cv = new CarveParams();
         List<Point> corners = new ArrayList<Point>();
-        
+
         corners.add(new Point(1, 1));
         corners.add(new Point(3, 0));
         corners.add(new Point(8, 1));
         corners.add(new Point(8, 8));
         corners.add(new Point(3, 7));
         corners.add(new Point(1, 9));
-        
+
         boolean[][] m = cv.createPixelMatrix(corners, cv.createShape(10, 10));
-        
+
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
                 System.out.print(m[x][y] ? 1 : 0);

@@ -30,7 +30,7 @@ public class HorizontalLineChanger extends LineChanger {
             for (int y = 0; y < newIp.getHeight(); y++) {
                 updatedPrioritized[x][y] = prioritizedPixels[x][y - shift];
                 newIp.putPixel(x, y, imgProcessor.getPixel(x, y - shift));
-                                                
+
                 if (shift < toAdd.length && toAdd[shift][x] == y) {
                     shift += 1;
                 }
@@ -38,7 +38,7 @@ public class HorizontalLineChanger extends LineChanger {
 
             for (int[] row : toAdd) {
                 newIp.putPixel(x, row[x] + 1, average(newIp.getPixel(x, row[x]), newIp.getPixel(x, row[x] + 2), gray8));
-            }    
+            }
         }
 
         prioritizedPixels = updatedPrioritized;
@@ -69,7 +69,7 @@ public class HorizontalLineChanger extends LineChanger {
                     continue;
                 }
 
-                updatedPrioritized[x][y-shift] = prioritizedPixels[x][y];
+                updatedPrioritized[x][y - shift] = prioritizedPixels[x][y];
                 newIp.putPixel(x, y - shift, imgProcessor.getPixel(x, y));
             }
         }

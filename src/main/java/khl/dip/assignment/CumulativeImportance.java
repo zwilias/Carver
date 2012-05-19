@@ -26,7 +26,7 @@ public abstract class CumulativeImportance {
     protected void findImportanceAndDirection(final int[][] pixels, int x, int y) {
         int direction = getDirection(x, y);
         directions[x][y] = direction;
-        
+
         if (prioritized[x][y]) {
             importanceGrid[y][x] = 0;
         } else {

@@ -69,7 +69,7 @@ public class Carve {
         // If we still have some lines left to handle, do it
         if (linesToAlter % params.linesPerTime > 0) {
             execAlter(cumulativeImportance, lineChanger, linesToAlter % params.linesPerTime);
-       }
+        }
     }
 
     public ImagePlus getImage() {

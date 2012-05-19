@@ -90,7 +90,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
         }
 
         Collections.sort(cumuls);
-        
+
         int i = 0;
 
         while (i < count && cumuls.size() > 0) {

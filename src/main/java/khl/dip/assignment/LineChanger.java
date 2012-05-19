@@ -11,11 +11,12 @@ import ij.process.ImageProcessor;
  * @author ilias
  */
 public abstract class LineChanger {
+
     public boolean[][] prioritizedPixels;
 
     public ImageProcessor changeLine(int[][] toChange, ImageProcessor imageProcessor, boolean addLines, boolean[][] prioritizedPixels) {
         this.prioritizedPixels = prioritizedPixels;
-        
+
         if (addLines) {
             return addLine(toChange, imageProcessor);
         } else {
