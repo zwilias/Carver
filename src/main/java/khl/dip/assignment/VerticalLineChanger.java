@@ -6,7 +6,6 @@ import ij.process.ImageProcessor;
 
 public class VerticalLineChanger extends LineChanger {
 
-    // TODO: actually implement this - current code is wonky at best
     @Override
     public ImageProcessor addLine(int[][] toAdd, ImageProcessor imgProcessor) {
         ImageProcessor newIp;

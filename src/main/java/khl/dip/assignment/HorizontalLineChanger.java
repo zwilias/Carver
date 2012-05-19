@@ -6,7 +6,6 @@ import ij.process.ImageProcessor;
 
 public class HorizontalLineChanger extends LineChanger {
 
-    //TODO: implement this
     @Override
     public ImageProcessor addLine(int[][] toAdd, ImageProcessor imgProcessor) {
         ImageProcessor newIp;

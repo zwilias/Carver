@@ -1,7 +1,5 @@
 package khl.dip.assignment;
 
-import ij.process.ByteProcessor;
-
 public class Gray8Convolution extends Gray8NeighborhoodOperation {
 
     private final double[][] kernel;

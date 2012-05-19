@@ -1,13 +1,23 @@
 package khl.dip.assignment;
 
 import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.ParameterException;
 import ij.ImagePlus;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class ImagePlusConverter implements IStringConverter<ImagePlus> {
 
-    //TODO: use imageIO to open this, so we get an Exception at load time, not an NPE later on
     @Override
     public ImagePlus convert(String string) {
-        return new ImagePlus(string);
+        try {
+            File file = new File(string);
+            BufferedImage inMemory = ImageIO.read(file);
+            return new ImagePlus(file.getName(), inMemory);
+        } catch (IOException ex) {
+            throw new ParameterException("Couldn't read image from '" + string + "'.");
+        }
     }
 }

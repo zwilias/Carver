@@ -1,7 +1,5 @@
 package khl.dip.assignment;
 
-import ij.process.ByteProcessor;
-
 public abstract class Gray8NeighborhoodOperation {
 
     public Gray8NeighborhoodOperation() {

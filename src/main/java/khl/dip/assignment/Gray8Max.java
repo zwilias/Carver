@@ -1,7 +1,5 @@
 package khl.dip.assignment;
 
-import ij.process.ByteProcessor;
-
 public class Gray8Max extends Gray8NeighborhoodOperation {
 
     @Override

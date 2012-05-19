@@ -10,7 +10,6 @@ import javax.imageio.ImageIO;
 
 public class Carve {
 
-    private static final int PRIOR_PIXEL = -100;
     private final Desaturate desaturate = new Desaturate();
     private final Gray8Max grayMax = new Gray8Max();
     private ImageProcessor imgProcessor;
