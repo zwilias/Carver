@@ -57,6 +57,14 @@ public class CarveParams {
         prioritized = createPixelMatrix(prioritizedList, img.getWidth(), img.getHeight());
     }
 
+    public boolean[][] createPixelMatrix(List<Point> corners, boolean[][] pixelMatrix) {
+        int width = pixelMatrix.length;
+        int height = pixelMatrix[0].length;
+        pixelMatrix = markEdges(corners, createShape(width, height));
+        pixelMatrix = fillShapes(pixelMatrix);
+        return pixelMatrix;
+    }
+
     public boolean[][] markEdges(List<Point> corners, boolean[][] pixelMatrix) {
         Point previous = corners.get(corners.size()-1);
         for (Point current : corners) {
@@ -73,7 +81,7 @@ public class CarveParams {
         boolean[][] pixelMatrix;
         if (coordinateList.size() > 0) {
             ArrayList<Point> corners = parseCorners(coordinateList, width, height);
-            pixelMatrix = markEdges(corners, createShape(width, height));
+            pixelMatrix = createPixelMatrix(corners, createShape(width, height));
         } else {
             pixelMatrix = createShape(width, height);
         }
@@ -102,6 +110,25 @@ public class CarveParams {
             }
         }
         return corners;
+    }
+    
+    public boolean[][] fillShapes(boolean[][] pixelMatrix) {
+        boolean fillMode;
+        for (int y = 0; y < pixelMatrix[0].length; y++) {
+            fillMode = false;
+            for (int x = 0; x < pixelMatrix.length; x++) {
+                if (pixelMatrix[x][y]) {
+                    // If the previous pixel wasn't filled (or there was no previous pixel), switch mode
+                    if (x == 0 || !pixelMatrix[x-1][y]) {
+                        fillMode = !fillMode;
+                    }
+                } else {
+                    pixelMatrix[x][y] = fillMode;
+                }
+            }
+        }
+        
+        return pixelMatrix;
     }
     
     public boolean[][] createShape(int width, int height) {
