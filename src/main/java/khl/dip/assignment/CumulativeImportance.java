@@ -29,7 +29,7 @@ public abstract class CumulativeImportance {
         int minimalNeighbor = findMinimalNeighbor(x, y, direction);
         directions[x][y] = direction;
         if (prioritized[x][y]) {
-            importanceGrid[y][x] = 0;
+            importanceGrid[y][x] = -255;
         } else {
             importanceGrid[y][x] = importance + minimalNeighbor;
         }
