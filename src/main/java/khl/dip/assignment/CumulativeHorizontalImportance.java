@@ -90,13 +90,8 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
         }
 
         Collections.sort(cumuls);
-
-        tmp = getLine(cumuls.poll().getKey());
-        for (int x = this.width - 1; x >= 0; x--) {
-            usedMatrix[x][tmp[x]] = 1;
-        }
-
-        int i = 1;
+        
+        int i = 0;
 
         while (i < count && cumuls.size() > 0) {
             tmp = getLine(cumuls.poll().getKey());

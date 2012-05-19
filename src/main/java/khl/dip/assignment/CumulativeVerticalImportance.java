@@ -88,12 +88,7 @@ public class CumulativeVerticalImportance extends CumulativeImportance {
         
         Collections.sort(cumuls);
         
-        tmp = getLine(cumuls.poll().getKey());
-        for (int y = this.height -1; y >= 0; y--) {
-            usedMatrix[tmp[y]][y] = 1;
-        }
-        
-        int i = 1;
+        int i = 0;
         
         while (i < count && cumuls.size() > 0) {
             tmp = getLine(cumuls.poll().getKey());

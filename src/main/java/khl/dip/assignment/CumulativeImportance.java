@@ -24,13 +24,14 @@ public abstract class CumulativeImportance {
     }
 
     protected void findImportanceAndDirection(final int[][] pixels, int x, int y) {
-        int importance = pixels[x][y];
         int direction = getDirection(x, y);
-        int minimalNeighbor = findMinimalNeighbor(x, y, direction);
         directions[x][y] = direction;
+        
         if (prioritized[x][y]) {
-            importanceGrid[y][x] = -255;
+            importanceGrid[y][x] = 0;
         } else {
+            int importance = pixels[x][y];
+            int minimalNeighbor = findMinimalNeighbor(x, y, direction);
             importanceGrid[y][x] = importance + minimalNeighbor;
         }
     }
