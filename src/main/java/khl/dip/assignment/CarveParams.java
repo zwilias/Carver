@@ -47,7 +47,7 @@ public class CarveParams {
                splitter = CommaParameterSplitter.class)
     private List<String> prioritizedList = new ArrayList<String>();
     
-    public int[][] prioritized;
+    public boolean[][] prioritized;
 
     public void checkParams() {
         if (!addLines && (verticalLinesToAlter >= img.getWidth() || horizontalLinesToAlter >= img.getHeight())) {
@@ -57,11 +57,11 @@ public class CarveParams {
         prioritized = createPixelMatrix(prioritizedList, img.getWidth(), img.getHeight());
     }
 
-    public int[][] markEdges(List<Point> corners, int[][] pixelMatrix) {
+    public boolean[][] markEdges(List<Point> corners, boolean[][] pixelMatrix) {
         Point previous = corners.get(corners.size()-1);
         for (Point current : corners) {
             for (Point p : current.getPointsOnLineTo(previous)) {
-                pixelMatrix[p.getX()][p.getY()] = 1;
+                pixelMatrix[p.getX()][p.getY()] = true;
             }
             previous = current;
         }
@@ -69,8 +69,8 @@ public class CarveParams {
         return pixelMatrix;
     }
 
-    private int[][] createPixelMatrix(List<String> coordinateList, int width, int height) {
-        int[][] pixelMatrix;
+    private boolean[][] createPixelMatrix(List<String> coordinateList, int width, int height) {
+        boolean[][] pixelMatrix;
         if (coordinateList.size() > 0) {
             ArrayList<Point> corners = parseCorners(coordinateList, width, height);
             pixelMatrix = markEdges(corners, createShape(width, height));
@@ -103,23 +103,8 @@ public class CarveParams {
         }
         return corners;
     }
-
-    public int[][] createShape(List<Point> corners, int width, int height) {
-        int[][] pixelMatrix = createShape(width, height);
-        
-        markEdges(corners, pixelMatrix);
-        
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                System.out.print(pixelMatrix[x][y]);
-            }
-            System.out.print("\n");
-        }
-        
-        return pixelMatrix;
-    }
     
-    public int[][] createShape(int width, int height) {
-        return new int[width][height];
+    public boolean[][] createShape(int width, int height) {
+        return new boolean[width][height];
     }
 }

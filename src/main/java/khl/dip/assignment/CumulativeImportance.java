@@ -10,11 +10,13 @@ public abstract class CumulativeImportance {
     protected int[][] importanceGrid;
     protected int width;
     protected List<SortableKeyValuePair> importances;
+    protected boolean[][] prioritized;
 
-    public void applyTo(final int[][] pixels) {
+    public void applyTo(final int[][] pixels, final boolean[][] prioritized) {
         this.width = pixels.length;
         this.height = pixels[0].length;
         this.importances = new LinkedList<SortableKeyValuePair>();
+        this.prioritized = prioritized;
 
         importanceGrid = new int[this.height][this.width];
         directions = new int[this.width][this.height];
@@ -26,7 +28,11 @@ public abstract class CumulativeImportance {
         int direction = getDirection(x, y);
         int minimalNeighbor = findMinimalNeighbor(x, y, direction);
         directions[x][y] = direction;
-        importanceGrid[y][x] = importance + minimalNeighbor;
+        if (prioritized[x][y]) {
+            importanceGrid[y][x] = 0;
+        } else {
+            importanceGrid[y][x] = importance + minimalNeighbor;
+        }
     }
 
     /**

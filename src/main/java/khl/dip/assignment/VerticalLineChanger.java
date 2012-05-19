@@ -45,7 +45,7 @@ public class VerticalLineChanger extends LineChanger {
         ImageProcessor newIp;
         int width = imgProcessor.getWidth() - toRemove.length;
         int height = imgProcessor.getHeight();
-        int[][] updatedPrioritized = new int[width][height];
+        boolean[][] updatedPrioritized = new boolean[width][height];
 
         if (imgProcessor instanceof ColorProcessor) {
             newIp = new ColorProcessor(width, height);

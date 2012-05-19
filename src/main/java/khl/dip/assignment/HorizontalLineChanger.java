@@ -17,7 +17,7 @@ public class HorizontalLineChanger extends LineChanger {
         int width = imgProcessor.getWidth();
         int height = imgProcessor.getHeight() - toRemove.length;
         ImageProcessor newIp;
-        int[][] updatedPrioritized = new int[width][height];
+        boolean[][] updatedPrioritized = new boolean[width][height];
 
         if (imgProcessor instanceof ColorProcessor) {
             newIp = new ColorProcessor(width, height);
