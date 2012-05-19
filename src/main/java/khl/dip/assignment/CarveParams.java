@@ -61,7 +61,7 @@ public class CarveParams {
         int width = pixelMatrix.length;
         int height = pixelMatrix[0].length;
         pixelMatrix = markEdges(corners, createShape(width, height));
-        pixelMatrix = fillShapes(pixelMatrix);
+        pixelMatrix = fillShapes(pixelMatrix, corners);
         return pixelMatrix;
     }
 
@@ -112,15 +112,21 @@ public class CarveParams {
         return corners;
     }
     
-    public boolean[][] fillShapes(boolean[][] pixelMatrix) {
+    // TODO: change this to first find a pixel that's IN the shape, then work from there
+    // right now it's impossible to determine whether we're actually in the shape, there'
+    // too many border-cases (got it?)
+    public boolean[][] fillShapes(boolean[][] pixelMatrix, List<Point> corners) {
         boolean fillMode;
         for (int y = 0; y < pixelMatrix[0].length; y++) {
             fillMode = false;
             for (int x = 0; x < pixelMatrix.length; x++) {
                 if (pixelMatrix[x][y]) {
-                    // If the previous pixel wasn't filled (or there was no previous pixel), switch mode
-                    if (x == 0 || !pixelMatrix[x-1][y]) {
-                        fillMode = !fillMode;
+                    if (!corners.contains(new Point(x, y))) {
+                        if (x > 0 && pixelMatrix[x-1][y] && x+1 < pixelMatrix.length && pixelMatrix[x+1][y]) {
+                            fillMode = false;
+                        } else {
+                            fillMode = !fillMode;
+                        }
                     }
                 } else {
                     pixelMatrix[x][y] = fillMode;
@@ -133,5 +139,26 @@ public class CarveParams {
     
     public boolean[][] createShape(int width, int height) {
         return new boolean[width][height];
+    }
+    
+    public static void main(String[] args) {
+        CarveParams cv = new CarveParams();
+        List<Point> corners = new ArrayList<Point>();
+        
+        corners.add(new Point(1, 1));
+        corners.add(new Point(3, 0));
+        corners.add(new Point(8, 1));
+        corners.add(new Point(8, 8));
+        corners.add(new Point(3, 7));
+        corners.add(new Point(1, 9));
+        
+        boolean[][] m = cv.createPixelMatrix(corners, cv.createShape(10, 10));
+        
+        for (int y = 0; y < 10; y++) {
+            for (int x = 0; x < 10; x++) {
+                System.out.print(m[x][y] ? 1 : 0);
+            }
+            System.out.print("\n");
+        }
     }
 }
