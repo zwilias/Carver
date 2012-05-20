@@ -13,6 +13,7 @@ public final class Carver {
     public static void main(final String[] args) {
         final CarveParams carveParams = new CarveParams();
         final JCommander jCommander = new JCommander();
+        jCommander.setProgramName("java -jar carver.jar");
         jCommander.addObject(carveParams);
         final StringBuilder usage = new StringBuilder();
         jCommander.usage(usage);
