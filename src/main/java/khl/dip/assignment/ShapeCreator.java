@@ -88,29 +88,4 @@ public class ShapeCreator {
     public boolean[][] createShape(int width, int height) {
         return new boolean[width][height];
     }
-    
-    
-
-    public static void main(String[] args) {
-        ShapeCreator creator = new ShapeCreator();
-        List<Point> corners = new ArrayList<Point>();
-
-        corners.add(new Point(1, 1));
-        corners.add(new Point(3, 0));
-        corners.add(new Point(8, 1));
-        corners.add(new Point(8, 8));
-        corners.add(new Point(3, 7));
-        corners.add(new Point(1, 9));
-        
-        Point shapePoint = new Point(5, 5);
-
-        boolean[][] m = creator.createPixelMatrix(corners, shapePoint, creator.createShape(10, 10));
-
-        for (int y = 0; y < 10; y++) {
-            for (int x = 0; x < 10; x++) {
-                System.out.print(m[x][y] ? 1 : 0);
-            }
-            System.out.print("\n");
-        }
-    }
 }

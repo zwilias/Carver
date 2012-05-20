@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class CumulativeImportance {
+    public static final int PRIORPIXEL = -99999;
+    public static final int PROTPIXEL = 99999;
 
     protected int[][] directions;
     protected int height;
@@ -30,9 +32,9 @@ public abstract class CumulativeImportance {
         directions[x][y] = direction;
 
         if (prioritized[x][y]) {
-            importanceGrid[y][x] = 0;
+            importanceGrid[y][x] = PRIORPIXEL;
         } else if (protectedPixels[x][y]) {
-            importanceGrid[y][x] = 9999;
+            importanceGrid[y][x] = PROTPIXEL;
         }
         
         else {
