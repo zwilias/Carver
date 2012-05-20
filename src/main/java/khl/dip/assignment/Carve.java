@@ -45,18 +45,20 @@ public class Carve {
 
     private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger, int numLines) {
         importance();
-        cumulativeImportance(cumulativeImportance, params.prioritized);
+        cumulativeImportance(cumulativeImportance, params.prioritizedPixels, params.protectedPixels);
         int[][] toChange = minimalImportance(cumulativeImportance, numLines);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritized);
-        params.prioritized = lineChanger.prioritizedPixels;
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        params.prioritizedPixels = lineChanger.prioritizedPixels;
+        params.protectedPixels = lineChanger.protectedPixels;
     }
 
     private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
         importance();
-        cumulativeImportance(cumulativeImportance, params.prioritized);
+        cumulativeImportance(cumulativeImportance, params.prioritizedPixels, params.protectedPixels);
         int[][] toChange = minimalImportance(cumulativeImportance);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritized);
-        params.prioritized = lineChanger.prioritizedPixels;
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        params.prioritizedPixels = lineChanger.prioritizedPixels;
+        params.protectedPixels = lineChanger.protectedPixels;
     }
 
     private void batchAlterLines(int linesToAlter, CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
@@ -89,8 +91,8 @@ public class Carve {
     }
 
     // Step 2: Compute the Cumulative Importance
-    private void cumulativeImportance(CumulativeImportance cumulativeImportance, boolean[][] prioritized) {
-        cumulativeImportance.applyTo(grayscale, prioritized);
+    private void cumulativeImportance(CumulativeImportance cumulativeImportance, boolean[][] prioritized, boolean[][] protectedPixels) {
+        cumulativeImportance.applyTo(grayscale, prioritized, protectedPixels);
     }
 
     // Step 3: Select a Line with Minimal Importance
