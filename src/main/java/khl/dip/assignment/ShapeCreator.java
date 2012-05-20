@@ -2,7 +2,6 @@
 package khl.dip.assignment;
 
 import com.beust.jcommander.ParameterException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
