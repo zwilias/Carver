@@ -6,7 +6,9 @@ import com.beust.jcommander.converters.CommaParameterSplitter;
 import com.beust.jcommander.validators.PositiveInteger;
 import ij.ImagePlus;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 public class CarveParams {
 
@@ -44,8 +46,14 @@ public class CarveParams {
     
     @Parameter(names = {"-p", "--prioritize"},
                description = "Comma-separated list of pixels to prioritize. Each pixel is in the format of XxY, with X its x-coordinate, 0-indexed on the left and Y its y-coordinate, 0-indexed on the top. These will be processed in the order in which they're supplied to create a shape with the supplied pixels functioning as corner-points.",
-               splitter = CommaParameterSplitter.class)
-    private List<String> prioritizedList = new ArrayList<String>();
+               splitter = CommaParameterSplitter.class,
+               converter = PointConverter.class)
+    private List<Point> prioritizedCorners = new ArrayList<Point>();
+    
+    @Parameter(names = {"-pi", "--prioritizedPoint"},
+               description = "A point that lies inside the shape described by the parameters to -p/--prioritize. Used to fill the shape. Mandatory when using -p/--priorize.",
+               converter = PointConverter.class)
+    private Point prioritizedPoint;
     
     public boolean[][] prioritized;
 
@@ -54,14 +62,14 @@ public class CarveParams {
             throw new ParameterException("Can't make image that small, there won't be anything left.");
         }
 
-        prioritized = createPixelMatrix(prioritizedList, img.getWidth(), img.getHeight());
+        prioritized = createPixelMatrix(prioritizedCorners, prioritizedPoint, img.getWidth(), img.getHeight());
     }
 
-    public boolean[][] createPixelMatrix(List<Point> corners, boolean[][] pixelMatrix) {
+    public boolean[][] createPixelMatrix(List<Point> corners, Point shapePoint, boolean[][] pixelMatrix) {
         int width = pixelMatrix.length;
         int height = pixelMatrix[0].length;
         pixelMatrix = markEdges(corners, createShape(width, height));
-        pixelMatrix = fillShapes(pixelMatrix, corners);
+        fillShape(pixelMatrix, shapePoint);
         return pixelMatrix;
     }
 
@@ -77,65 +85,61 @@ public class CarveParams {
         return pixelMatrix;
     }
 
-    private boolean[][] createPixelMatrix(List<String> coordinateList, int width, int height) {
+    private boolean[][] createPixelMatrix(List<Point> cornerList, Point shapePoint, int width, int height) {
         boolean[][] pixelMatrix;
-        if (coordinateList.size() > 0) {
-            ArrayList<Point> corners = parseCorners(coordinateList, width, height);
-            pixelMatrix = createPixelMatrix(corners, createShape(width, height));
+        if (cornerList.size() > 0) {
+            checkCorners(cornerList, width, height);
+            try {
+                checkPoint(shapePoint, width, height);
+            } catch (ParameterException e) {
+                throw new ParameterException("The supplied point inside the shape was not valid.");
+            }
+            pixelMatrix = createPixelMatrix(cornerList, shapePoint, createShape(width, height));
         } else {
             pixelMatrix = createShape(width, height);
         }
         return pixelMatrix;
     }
 
-    public ArrayList<Point> parseCorners(List<String> coordinateList, int width, int height) throws
-            ParameterException {
-        ArrayList<Point> corners = new ArrayList<Point>(coordinateList.size());
-        for (String param : coordinateList) {
-            String[] coordinates = param.split("x");
-            if (coordinates.length != 2) {
-                throw new ParameterException("Coordinate '" + param + "' is not valid.");
-            }
-
-            try {
-                int x = Integer.parseInt(coordinates[0]);
-                int y = Integer.parseInt(coordinates[1]);
-
-                if (x > width || y > height) {
-                    throw new ParameterException("Coordinate '" + param + "' points to a pixel outside the current image");
-                }
-
-                corners.add(new Point(x, y));
-            } catch (NumberFormatException e) {
-                throw new ParameterException("Coordinate '" + param + "' is not valid.");
-            }
+    public void checkCorners(List<Point> cornerList, int width, int height) {
+        for (Point p : cornerList) {
+            checkPoint(p, width, height);
         }
-        return corners;
     }
-
-    // TODO: change this to first find a pixel that's IN the shape, then work from there
-    // right now it's impossible to determine whether we're actually in the shape, there'
-    // too many border-cases (got it?)
-    public boolean[][] fillShapes(boolean[][] pixelMatrix, List<Point> corners) {
-        boolean fillMode;
-        for (int y = 0; y < pixelMatrix[0].length; y++) {
-            fillMode = false;
-            for (int x = 0; x < pixelMatrix.length; x++) {
-                if (pixelMatrix[x][y]) {
-                    if (!corners.contains(new Point(x, y))) {
-                        if (x > 0 && pixelMatrix[x - 1][y] && x + 1 < pixelMatrix.length && pixelMatrix[x + 1][y]) {
-                            fillMode = false;
-                        } else {
-                            fillMode = !fillMode;
-                        }
-                    }
-                } else {
-                    pixelMatrix[x][y] = fillMode;
+    
+    public void checkPoint(Point p, int width, int height) {
+        if (p == null) {
+            throw new ParameterException("No point.");
+        }
+        
+        if (p.getX() < 0 || p.getX() >= width || p.getY() < 0 || p.getY() >= height) {
+            throw new ParameterException("Coordinate '" + p + "' refers to a point outside the image.");
+        }
+    }
+    
+    private void fillShape(boolean[][] pixelMatrix, Point shapePoint) {
+        Queue<Point> queue = new LinkedList<Point>();
+        int width = pixelMatrix.length;
+        int height = pixelMatrix[0].length;
+        queue.add(shapePoint);
+        
+        while (!queue.isEmpty()) {
+            Point p = queue.poll();
+            if (p.getX() >= 0 && p.getX() < width && p.getY() >= 0 && p.getY() < height && !pixelMatrix[p.getX()][p.getY()]) {
+                int w = p.getX();
+                int e = p.getX();
+                
+                for (; w > 0 && !pixelMatrix[w][p.getY()]; w--) {}
+                for (; e < width && !pixelMatrix[e][p.getY()]; e++) {}
+                
+                for (int x = w+1; x < e; x++) {
+                    pixelMatrix[x][p.getY()] = true;
+                                    
+                    if (p.getY() > 0 && !pixelMatrix[x][p.getY() - 1]) queue.add(new Point(x, p.getY() - 1));
+                    if (p.getY()+1 < height && !pixelMatrix[x][p.getY() + 1]) queue.add(new Point(x, p.getY() + 1));
                 }
             }
         }
-
-        return pixelMatrix;
     }
 
     public boolean[][] createShape(int width, int height) {
@@ -152,8 +156,10 @@ public class CarveParams {
         corners.add(new Point(8, 8));
         corners.add(new Point(3, 7));
         corners.add(new Point(1, 9));
+        
+        Point shapePoint = new Point(5, 5);
 
-        boolean[][] m = cv.createPixelMatrix(corners, cv.createShape(10, 10));
+        boolean[][] m = cv.createPixelMatrix(corners, shapePoint, cv.createShape(10, 10));
 
         for (int y = 0; y < 10; y++) {
             for (int x = 0; x < 10; x++) {
