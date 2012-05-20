@@ -3,7 +3,7 @@ package khl.dip.assignment;
 import java.util.Collections;
 import java.util.LinkedList;
 
-public class CumulativeHorizontalImportance extends CumulativeImportance {
+public class CumulativeHorizontalImportance extends AbstractCumulativeImportance {
 
     @Override
     protected void populateDirections(final int[][] pixels) {
@@ -27,12 +27,12 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
     }
 
     @Override
-    protected int findMinimalNeighbor(int x, int y, int direction) {
+    protected int findMinimalNeighbor(final int x, final int y, final int direction) {
         return importanceGrid[y + direction][x - 1];
     }
 
     @Override
-    protected int getDirection(int x, int y) {
+    protected int getDirection(final int x, final int y) {
         int direction = 0;
         if (y == 0) {
             if (importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
@@ -64,25 +64,26 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
     }
 
     @Override
-    public int[] getLine(int idx) {
+    public int[] getLine(final int idx) {
         final int[] result = new int[this.width];
 
+        int local = idx;
         result[result.length - 1] = idx;
 
         for (int x = result.length - 1; x > 0; x--) {
-            idx += directions[x][idx];
-            result[x - 1] = idx;
+            local += directions[x][local];
+            result[x - 1] = local;
         }
 
         return result;
     }
 
     @Override
-    public int[][] getLeastImportantLines(int count) {
+    public int[][] getLeastImportantLines(final int count) {
         int[][] sorted = new int[count][this.width];
         int[][] usedMatrix = new int[this.width][this.height];
         int[] tmp;
-        LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
+        final LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
 
         // First get all the cumulative importance things
         for (int i = 0; i < this.height; i++) {
@@ -93,7 +94,7 @@ public class CumulativeHorizontalImportance extends CumulativeImportance {
 
         int i = 0;
 
-        while (i < count && cumuls.size() > 0) {
+        while (i < count && !cumuls.isEmpty()) {
             tmp = getLine(cumuls.poll().getKey());
 
             // Find out if this line crosses any other line already in the array

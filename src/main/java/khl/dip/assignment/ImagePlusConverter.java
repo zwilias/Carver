@@ -11,10 +11,10 @@ import javax.imageio.ImageIO;
 public class ImagePlusConverter implements IStringConverter<ImagePlus> {
 
     @Override
-    public ImagePlus convert(String string) {
+    public ImagePlus convert(final String string) {
         try {
-            File file = new File(string);
-            BufferedImage inMemory = ImageIO.read(file);
+            final File file = new File(string);
+            final BufferedImage inMemory = ImageIO.read(file);
             return new ImagePlus(file.getName(), inMemory);
         } catch (IOException ex) {
             throw new ParameterException("Couldn't read image from '" + string + "'.");

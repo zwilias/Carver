@@ -4,15 +4,15 @@ import ij.process.ByteProcessor;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 
-public class HorizontalLineChanger extends LineChanger {
+public class HorizontalLineChanger extends AbstractLineChanger {
 
     @Override
-    public ImageProcessor addLine(int[][] toAdd, ImageProcessor imgProcessor) {
+    public ImageProcessor addLine(final int[][] toAdd, final ImageProcessor imgProcessor) {
         ImageProcessor newIp;
-        int width = imgProcessor.getWidth();
-        int height = imgProcessor.getHeight() + toAdd.length;
-        boolean[][] updatedPrioritized = new boolean[width][height];
-        boolean[][] updatedProtected = new boolean[width][height];
+        final int width = imgProcessor.getWidth();
+        final int height = imgProcessor.getHeight() + toAdd.length;
+        boolean[][] updatedPrio = new boolean[width][height];
+        boolean[][] updatedProt = new boolean[width][height];
         boolean gray8;
 
         if (imgProcessor instanceof ColorProcessor) {
@@ -29,8 +29,8 @@ public class HorizontalLineChanger extends LineChanger {
         for (int x = 0; x < newIp.getWidth(); x++) {
             shift = 0;
             for (int y = 0; y < newIp.getHeight(); y++) {
-                updatedPrioritized[x][y] = prioritizedPixels[x][y - shift];
-                updatedProtected[x][y] = protectedPixels[x][y - shift];
+                updatedPrio[x][y] = prioritizedPixels[x][y - shift];
+                updatedProt[x][y] = protectedPixels[x][y - shift];
                 newIp.putPixel(x, y, imgProcessor.getPixel(x, y - shift));
 
                 if (shift < toAdd.length && toAdd[shift][x] == y) {
@@ -43,18 +43,18 @@ public class HorizontalLineChanger extends LineChanger {
             }
         }
 
-        prioritizedPixels = updatedPrioritized;
-        protectedPixels = updatedProtected;
+        prioritizedPixels = updatedPrio;
+        protectedPixels = updatedProt;
         return newIp;
     }
 
     @Override
-    public ImageProcessor removeLine(int[][] toRemove, ImageProcessor imgProcessor) {
-        int width = imgProcessor.getWidth();
-        int height = imgProcessor.getHeight() - toRemove.length;
+    public ImageProcessor removeLine(final int[][] toRemove, final ImageProcessor imgProcessor) {
+        final int width = imgProcessor.getWidth();
+        final int height = imgProcessor.getHeight() - toRemove.length;
         ImageProcessor newIp;
-        boolean[][] updatedPrioritized = new boolean[width][height];
-        boolean[][] updatedProtected = new boolean[width][height];
+        boolean[][] updatedPrio = new boolean[width][height];
+        boolean[][] updatedProt = new boolean[width][height];
 
         if (imgProcessor instanceof ColorProcessor) {
             newIp = new ColorProcessor(width, height);
@@ -73,14 +73,14 @@ public class HorizontalLineChanger extends LineChanger {
                     continue;
                 }
 
-                updatedPrioritized[x][y - shift] = prioritizedPixels[x][y];
-                updatedProtected[x][y - shift] = protectedPixels[x][y];
+                updatedPrio[x][y - shift] = prioritizedPixels[x][y];
+                updatedProt[x][y - shift] = protectedPixels[x][y];
                 newIp.putPixel(x, y - shift, imgProcessor.getPixel(x, y));
             }
         }
 
-        this.prioritizedPixels = updatedPrioritized;
-        this.protectedPixels = updatedProtected;
+        this.prioritizedPixels = updatedPrio;
+        this.protectedPixels = updatedProt;
         return newIp;
     }
 }

@@ -10,7 +10,7 @@ public class Desaturate {
      * applying it in-place. Keep this in mind.
      */
 
-    public int[][] applyTo(ImageProcessor ip) {
+    public int[][] applyTo(final ImageProcessor ip) {
         final int[][] result = new int[ip.getWidth()][ip.getHeight()];
 
         if (ip instanceof ColorProcessor) {
@@ -32,7 +32,7 @@ public class Desaturate {
         return result;
     }
 
-    public int desaturate(int color) {
+    public int desaturate(final int color) {
         return (int) (0.21 * ((color & 0xff0000) >> 16) + 0.72 * ((color & 0x00ff00) >> 8) + 0.07 * (color & 0x0000ff));
     }
 }

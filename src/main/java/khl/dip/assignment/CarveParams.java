@@ -19,7 +19,7 @@ public class CarveParams {
     @Parameter(names = {"-v", "--vertical"},
                description = "Number of vertical lines to be removed or added.",
                validateWith = PositiveInteger.class)
-    public int verticalLinesToAlter = 0;
+    public int vertLinesToAlter = 0;
     
     @Parameter(names = {"-o", "--output"},
                description = "File to write the carved image to. (If not provided, image is displayed.")
@@ -28,7 +28,7 @@ public class CarveParams {
     @Parameter(names = {"-h", "--horizontal"},
                description = "Number of horizontal lines to be removed or added.",
                validateWith = PositiveInteger.class)
-    public int horizontalLinesToAlter = 0;
+    public int horiLinesToAlter = 0;
     
     @Parameter(names = {"--help"},
                description = "Show usage.")
@@ -46,7 +46,7 @@ public class CarveParams {
                description = "Comma-separated list of pixels to prioritize. Each pixel is in the format of XxY, with X its x-coordinate, 0-indexed on the left and Y its y-coordinate, 0-indexed on the top. These will be processed in the order in which they're supplied to create a shape with the supplied pixels functioning as corner-points.",
                splitter = CommaParameterSplitter.class,
                converter = PointConverter.class)
-    private List<Point> prioritizedCorners = new ArrayList<Point>();
+    private final List<Point> prioCorners = new ArrayList<Point>();
     
     @Parameter(names = {"-pi", "--prioritizedPoint"},
                description = "A point that lies inside the shape described by the parameters to -p/--prioritize. Used to fill the shape. Mandatory when using -p/--priorize.",
@@ -57,7 +57,7 @@ public class CarveParams {
                description = "Comma-separated list of pixels to protect. Each pixel is in the format of XxY, with X its x-coordinate, 0-indexed on the left and Y its y-coordinate, 0-indexed on the top. These will be processed in the order in which they're supplied to create a shape with the supplied pixels functioning as corner-points.",
                splitter = CommaParameterSplitter.class,
                converter = PointConverter.class)
-    private List<Point> protectedCorners = new ArrayList<Point>();
+    private final List<Point> protCorners = new ArrayList<Point>();
     
     @Parameter(names = {"-si", "--protectedPoint"},
                description = "A point that lies inside the shape described by the parameters to -s/--protect. Used to fill the shape. Mandatory when using -s/--protect.",
@@ -68,12 +68,12 @@ public class CarveParams {
     public boolean[][] protectedPixels;
 
     public void checkParams() {
-        if (!addLines && (verticalLinesToAlter >= img.getWidth() || horizontalLinesToAlter >= img.getHeight())) {
+        if (!addLines && (vertLinesToAlter >= img.getWidth() || horiLinesToAlter >= img.getHeight())) {
             throw new ParameterException("Can't make image that small, there won't be anything left.");
         }
 
-        ShapeCreator creator = new ShapeCreator();
-        prioritizedPixels = creator.createPixelMatrix(prioritizedCorners, prioritizedPoint, img.getWidth(), img.getHeight());
-        protectedPixels = creator.createPixelMatrix(protectedCorners, protectedPoint, img.getWidth(), img.getHeight());
+        final ShapeCreator creator = new ShapeCreator();
+        prioritizedPixels = creator.createPixelMatrix(prioCorners, prioritizedPoint, img.getWidth(), img.getHeight());
+        protectedPixels = creator.createPixelMatrix(protCorners, protectedPoint, img.getWidth(), img.getHeight());
     }
 }

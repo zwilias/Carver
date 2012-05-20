@@ -17,60 +17,59 @@ public class Carve {
     private final Sobel sobel = new Sobel();
     private final CarveParams params;
 
-    public Carve(CarveParams params) {
+    public Carve(final CarveParams params) {
         this.params = params;
     }
 
     public void run() {
         this.imgProcessor = params.img.getProcessor();
 
-        alterLines(params.verticalLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
-        alterLines(params.horizontalLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
+        alterLines(params.vertLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        alterLines(params.horiLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
 
         params.img.setProcessor(imgProcessor);
 
         showOrSave();
     }
 
-    private void alterLines(int linesToAlter, LineChanger lineChanger, CumulativeImportance cumulativeImportance) {
+    private void alterLines(final int linesToAlter, final AbstractLineChanger lineChanger, final AbstractCumulativeImportance cumulImportance) {
         if (params.linesPerTime > 1) {
-            batchAlterLines(linesToAlter, cumulativeImportance, lineChanger);
+            batchAlterLines(linesToAlter, cumulImportance, lineChanger);
         } else {
-            while (linesToAlter > 0) {
-                execAlter(cumulativeImportance, lineChanger);
-                linesToAlter--;
+            for (int altered = 0; altered < linesToAlter; altered++) {
+                execAlter(cumulImportance, lineChanger);
             }
         }
     }
 
-    private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger, int numLines) {
+    private void execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger, final int numLines) {
         importance();
-        cumulativeImportance(cumulativeImportance, params.prioritizedPixels, params.protectedPixels);
-        int[][] toChange = minimalImportance(cumulativeImportance, numLines);
+        cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
+        final int[][] toChange = minimalImportance(cumulImportance, numLines);
         this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
     }
 
-    private void execAlter(CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
+    private void execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
         importance();
-        cumulativeImportance(cumulativeImportance, params.prioritizedPixels, params.protectedPixels);
-        int[][] toChange = minimalImportance(cumulativeImportance);
+        cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
+        final int[][] toChange = minimalImportance(cumulImportance);
         this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
     }
 
-    private void batchAlterLines(int linesToAlter, CumulativeImportance cumulativeImportance, LineChanger lineChanger) {
+    private void batchAlterLines(final int linesToAlter, final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
         int linesDone = 0;
         while (linesDone < linesToAlter - linesToAlter % params.linesPerTime) {
-            execAlter(cumulativeImportance, lineChanger, params.linesPerTime);
+            execAlter(cumulImportance, lineChanger, params.linesPerTime);
             linesDone += params.linesPerTime;
         }
 
         // If we still have some lines left to handle, do it
         if (linesToAlter % params.linesPerTime > 0) {
-            execAlter(cumulativeImportance, lineChanger, linesToAlter % params.linesPerTime);
+            execAlter(cumulImportance, lineChanger, linesToAlter % params.linesPerTime);
         }
     }
 
@@ -91,26 +90,26 @@ public class Carve {
     }
 
     // Step 2: Compute the Cumulative Importance
-    private void cumulativeImportance(CumulativeImportance cumulativeImportance, boolean[][] prioritized, boolean[][] protectedPixels) {
-        cumulativeImportance.applyTo(grayscale, prioritized, protectedPixels);
+    private void cumulativeImportance(final AbstractCumulativeImportance cumulImportance, final boolean[][] prioritized, final boolean[][] protectedPixels) {
+        cumulImportance.applyTo(grayscale, prioritized, protectedPixels);
     }
 
     // Step 3: Select a Line with Minimal Importance
-    private int[][] minimalImportance(CumulativeImportance cumulativeImportance, int count) {
-        return cumulativeImportance.getLeastImportantLines(count);
+    private int[][] minimalImportance(final AbstractCumulativeImportance cumulImportance, final int count) {
+        return cumulImportance.getLeastImportantLines(count);
     }
 
-    private int[][] minimalImportance(CumulativeImportance cumulativeImportance) {
-        return new int[][]{cumulativeImportance.getLine(cumulativeImportance.getLeastImportantLine())};
+    private int[][] minimalImportance(final AbstractCumulativeImportance cumulImportance) {
+        return new int[][]{cumulImportance.getLine(cumulImportance.getLeastImportantLine())};
     }
 
     private void showOrSave() {
         if (params.outFile == null) {
-            ImageWindow window = new ImageWindow(params.img);
+            final ImageWindow window = new ImageWindow(params.img);
             window.setVisible(true);
         } else {
             try {
-                String type = params.outFile.substring(params.outFile.lastIndexOf(".") + 1);
+                final String type = params.outFile.substring(params.outFile.lastIndexOf(".") + 1);
                 ImageIO.write(params.img.getBufferedImage(), type, new File(params.outFile));
             } catch (IOException ex) {
                 throw new ParameterException("Could not write to " + params.outFile + ": " + ex.getMessage());

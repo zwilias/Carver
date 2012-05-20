@@ -22,24 +22,24 @@ public class Point {
 
     // http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Simplification
     // Thank you, wikipedia.
-    public List<Point> getPointsOnLineTo(Point otherPoint) {
-        List<Point> result = new ArrayList<Point>();
+    public List<Point> getPointsOnLineTo(final Point otherPoint) {
+        final List<Point> result = new ArrayList<Point>();
         result.add(this);
 
         int x0 = this.getX();
         int y0 = this.getY();
-        int x1 = otherPoint.getX();
-        int y1 = otherPoint.getY();
+        final int x1 = otherPoint.getX();
+        final int y1 = otherPoint.getY();
 
-        int dx = Math.abs(x1 - x0);
-        int dy = Math.abs(y1 - y0);
-        int sx = (x0 < x1) ? 1 : -1;
-        int sy = (y0 < y1) ? 1 : -1;
+        final int dx = Math.abs(x1 - x0);
+        final int dy = Math.abs(y1 - y0);
+        final int sx = (x0 < x1) ? 1 : -1;
+        final int sy = (y0 < y1) ? 1 : -1;
 
         int err = dx - dy;
 
         while (!(x0 == x1 && y0 == y1)) {
-            int doubleErr = 2 * err;
+            final int doubleErr = 2 * err;
 
             if (doubleErr > -dy) {
                 err -= dy;
@@ -58,21 +58,21 @@ public class Point {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
-            return false;
+    public boolean equals(final Object obj) {
+        boolean result;
+        
+        if (obj instanceof Point) {
+            final Point point = (Point) obj;
+            if (this.x == point.getX() && this.y == point.getY()) {
+                result = true;
+            } else {
+                result = false;
+            }
+        } else {
+            result = false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final Point other = (Point) obj;
-        if (this.x != other.getX()) {
-            return false;
-        }
-        if (this.y != other.getY()) {
-            return false;
-        }
-        return true;
+        
+        return result;
     }
 
     @Override

@@ -7,17 +7,18 @@ import com.beust.jcommander.ParameterException;
  * Hello world!
  *
  */
-public class Carver {
+public final class Carver {
+    private Carver() {}
 
-    public static void main(String[] args) {
-        CarveParams carveParams = new CarveParams();
-        JCommander jc = new JCommander();
-        jc.addObject(carveParams);
-        StringBuilder usage = new StringBuilder();
-        jc.usage(usage);
+    public static void main(final String[] args) {
+        final CarveParams carveParams = new CarveParams();
+        final JCommander jCommander = new JCommander();
+        jCommander.addObject(carveParams);
+        final StringBuilder usage = new StringBuilder();
+        jCommander.usage(usage);
 
         try {
-            jc.parse(args);
+            jCommander.parse(args);
             carveParams.checkParams();
             if (carveParams.showUsage) {
                 System.out.println(usage);

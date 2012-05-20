@@ -1,15 +1,16 @@
 package khl.dip.assignment;
 
-public class Gray8Convolution extends Gray8NeighborhoodOperation {
+public class Gray8Convolution extends AbstractGray8NeighborhoodOperation {
 
     private final double[][] kernel;
 
     public Gray8Convolution(final double[][] kernel) {
+        super();
         this.kernel = kernel;
     }
 
     @Override
-    protected int f(int[][] pixels, int x, int y) {
+    protected int operation(final int[][] pixels, final int x, final int y) {
         double total = 0.0;
         final int kWidth = kernel.length;
         final int kHeight = kernel[0].length;
@@ -18,13 +19,13 @@ public class Gray8Convolution extends Gray8NeighborhoodOperation {
 
         for (int i = -(kWidth - 1) / 2; i < (kWidth - 1) / 2; i++) {
             for (int j = -(kHeight - 1) / 2; j <= (kHeight - 1) / 2; j++) {
-                int ipX = x + i;
-                int ipY = y + j;
+                final int ipX = x + i;
+                final int ipY = y + j;
                 if (ipX < 0 || ipY < 0 || ipX >= iWidth || ipY >= iHeight) {
                     continue;
                 }
-                int kX = i + (kWidth / 2);
-                int kY = j + (kHeight / 2);
+                final int kX = i + (kWidth / 2);
+                final int kY = j + (kHeight / 2);
                 total += pixels[ipX][ipY] * kernel[kX][kY];
             }
         }

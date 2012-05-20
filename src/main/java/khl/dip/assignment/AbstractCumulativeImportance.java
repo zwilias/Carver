@@ -3,7 +3,7 @@ package khl.dip.assignment;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class CumulativeImportance {
+public abstract class AbstractCumulativeImportance {
     public static final int PRIORPIXEL = -99999;
     public static final int PROTPIXEL = 99999;
 
@@ -27,8 +27,8 @@ public abstract class CumulativeImportance {
         populateDirections(pixels);
     }
 
-    protected void findImportanceAndDirection(final int[][] pixels, int x, int y) {
-        int direction = getDirection(x, y);
+    protected void findImportanceAndDirection(final int[][] pixels, final int x, final int y) {
+        final int direction = getDirection(x, y);
         directions[x][y] = direction;
 
         if (prioritized[x][y]) {
@@ -38,8 +38,8 @@ public abstract class CumulativeImportance {
         }
         
         else {
-            int importance = pixels[x][y];
-            int minimalNeighbor = findMinimalNeighbor(x, y, direction);
+            final int importance = pixels[x][y];
+            final int minimalNeighbor = findMinimalNeighbor(x, y, direction);
             importanceGrid[y][x] = importance + minimalNeighbor;
         }
     }
@@ -116,7 +116,7 @@ public abstract class CumulativeImportance {
         private final int key;
         private final int value;
 
-        public SortableKeyValuePair(int key, int value) {
+        public SortableKeyValuePair(final int key, final int value) {
             this.key = key;
             this.value = value;
         }
@@ -130,8 +130,8 @@ public abstract class CumulativeImportance {
         }
 
         @Override
-        public int compareTo(SortableKeyValuePair t) {
-            return this.value - t.value;
+        public int compareTo(final SortableKeyValuePair otherPair) {
+            return this.value - otherPair.value;
         }
     }
 }
