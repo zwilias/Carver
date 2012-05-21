@@ -50,6 +50,7 @@ $endif$
 </header>
 $endif$
 $if(toc)$
+<h2>Table of Contents</h2>
 <nav id="$idprefix$TOC">
 $toc$
 </nav>

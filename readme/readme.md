@@ -149,3 +149,27 @@ java -jar target/carver.jar -v 100 -h 50 -a -i images/tower.png
 
 ![Figure 5. Enlarged image](images/tower-example4.png)
 
+### Upload to Facebook ###
+
+Mostly out of curiosity, I also implemented uploading to facebook using the simple and flexible [RestFB Facebook Graph API Client Library](http://restfb.com/). Uploading to facebook, however, requires the use of an OAuth Access Token. This is bound to both the application and the user, so for now, we just ask for the Access Token to be passed in as a parameter with `-fb`.
+
+Acquiring an access token is quite simple. Go to the [Graph API Explorer](https://developers.facebook.com/tools/explorer) tool, hit "Get Access Token", make sure `publish_stream` is checked under "Extended Permissions", hit "Get Access Token", and copy-paste the token facebook generated. When supplied through the `-fb` parameter, carver will upload the picture to facebook as well as execute the default action (i.e. displaying it or writing it to a file when `-o` is supplied.)
+
+It will spit out a link to the image, and that's all there is to it.
+
+## References and links ##
+
+Carver is built on a number of libraries:
+
+- Good old [ImageJ](http://rsbweb.nih.gov/ij/) for manipulating images.
+- The pretty awesome, annotation based command-line argument parser [JCommander](http://jcommander.org/).
+- The amazingly simple [RestFB](http://restfb.com/) [Facebook Graph API](https://developers.facebook.com/docs/reference/api/) Client library.
+- The fairly straightforward [Maven](http://maven.apache.org/) "software project management and comprehension tool".
+
+Another tool used during the development of carver is the "don't feel too proud of this code, son" tool [PMD](http://pmd.sourceforge.net/pmd-5.0.0/). It has proven to be quite useful in spotting all kinds of problems early on.
+
+This readme file was created using [pandoc](http://johnmacfarlane.net/pandoc/), the universal document converter.
+
+The "rendering a line on a raster based on 2 endpoints" algorithm used in carver is an implementation of the pseudo-code version of [Bresenham's line algorithm](http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Simplification) as found on wikipedia.
+
+Finally, [github](http://github.com) is pretty awesome.

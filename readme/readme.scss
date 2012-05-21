@@ -38,8 +38,8 @@ hr {
 #page {
     width: 900px;
     margin: 0 auto;
-    border-left: 2px solid #EEE;
-    border-right: 2px solid #EEE;
+    border-left: 1px solid #CCC;
+    border-right: 1px solid #CCC;
     padding: 10px 30px;
 }
 
@@ -110,19 +110,19 @@ sub * {
 ul {
     list-style-type: disc;
     margin-left: 20px;
+    margin-bottom: 15px;
+    ul {
+        list-style-type: square;
+        margin-bottom: 0;
+        ul {
+            list-style-type: circle;
+        }
+    }
 }
 
 ol {
     list-style-type: decimal;
     margin-left: 20px;
-}
-
-ul ul {
-    list-style-type: square;
-}
-
-ul ul ul {
-    list-style-type: circle;
 }
 
 em {
