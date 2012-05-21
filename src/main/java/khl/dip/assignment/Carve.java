@@ -1,11 +1,18 @@
 package khl.dip.assignment;
 
 import com.beust.jcommander.ParameterException;
+import com.restfb.BinaryAttachment;
+import com.restfb.DefaultFacebookClient;
+import com.restfb.FacebookClient;
+import com.restfb.Parameter;
+import com.restfb.types.FacebookType;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
 import ij.process.ImageProcessor;
-import java.io.File;
-import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 
 public class Carve {
@@ -104,6 +111,26 @@ public class Carve {
     }
 
     private void showOrSave() {
+        if (params.facebookAccessToken != null) {
+            try {
+                final String shortname = params.img.getShortTitle();
+                final FacebookClient fbClient = new DefaultFacebookClient(params.facebookAccessToken);
+                final BufferedImage bImg = params.img.getBufferedImage();
+                final ByteArrayOutputStream byteOutStream = new ByteArrayOutputStream();
+                ImageIO.write(bImg, "png", byteOutStream);
+                final InputStream inputStream = new ByteArrayInputStream(byteOutStream.toByteArray());
+                
+                final FacebookType response = fbClient.publish("me/photos", 
+                        FacebookType.class, 
+                        BinaryAttachment.with(shortname, inputStream), 
+                        Parameter.with("message", "Resized by Carver v1.0"));
+                System.out.println("https://www.facebook.com/photo.php?fbid=" + response.getId());
+            } catch (IOException ex) {
+                Logger.getLogger(Carve.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        
         if (params.outFile == null) {
             final ImageWindow window = new ImageWindow(params.img);
             window.setVisible(true);

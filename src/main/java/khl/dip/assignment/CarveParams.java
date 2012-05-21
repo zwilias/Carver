@@ -65,6 +65,10 @@ public class CarveParams {
                converter = PointConverter.class)
     private Point protectedPoint;
     
+    @Parameter(names = {"-fb", "--facebookAccessToken"},
+               description = "A facebook OAuth access token. Check the readme for details on how to obtain and use this. When provided, the picture will also be uploaded to facebook.")
+    public String facebookAccessToken;
+    
     public boolean[][] prioritizedPixels;
     public boolean[][] protectedPixels;
 
