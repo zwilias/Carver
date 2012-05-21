@@ -16,6 +16,7 @@ public class CarveParams {
                description = "Input image")
     public ImagePlus img;
     
+    // TODO: throws a numberformatexception when not a number. damnit.
     @Parameter(names = {"-v", "--vertical"},
                description = "Number of vertical lines to be removed or added.",
                validateWith = PositiveInteger.class)
