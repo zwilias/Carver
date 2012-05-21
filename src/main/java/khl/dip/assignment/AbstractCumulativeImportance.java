@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractCumulativeImportance {
-    public static final int PRIORPIXEL = -99999;
+    public static final int PRIORPIXEL = 0;
     public static final int PROTPIXEL = 99999;
 
     protected int[][] directions;
