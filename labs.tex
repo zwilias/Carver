@@ -1,0 +1,66 @@
+\documentclass[a4paper]{article}
+\usepackage[dutch]{babel}
+\usepackage{fancyhdr}
+\usepackage{palatino}
+\usepackage{mathpazo}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{fullpage}
+\usepackage{lastpage}
+\usepackage[eurosym,left]{}
+\usepackage{graphicx,subfigure}
+\usepackage[utf8]{inputenc}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{fancyvrb}
+\usepackage{enumerate}
+\usepackage[T1]{fontenc}
+% \usepackage{minted}
+
+\lstset{
+    breaklines,
+    showstringspaces=false,
+    basicstyle=\ttfamily\small,
+    literate={›}{{\guilsinglright}}1
+}
+\setlength{\unitlength}{1pt}
+\setlength{\headheight}{14pt}
+\setlength{\parindent}{0pt} 
+\setlength{\parskip}{2ex}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\lfoot{$author$}
+\cfoot{\thepage}
+%% Niet vergeten aan te passen hieronder ... %%
+\rfoot{KHLeuven, dept. G\&T, 2TX3/4}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0.3pt}
+\newcommand{\punt}[1]{ }
+
+
+\begin{document}
+\noindent \begin{tabular}{lr}
+\multirow{5}{10cm}[5mm]{\includegraphics[width=50mm]{LogoGT.jpg} \hfill}
+& {\bf Operating Systems} \\
+& {\bf $author$}\\
+& 2TX3/4\\
+& $date$ \\
+& {\bf $title$} 
+\\ & \\ \hline
+\end{tabular}
+
+
+\vspace{0.4cm}
+\noindent
+$if(title)$
+{\huge {\bf $title$
+\\}}
+$endif$
+
+\noindent
+$body$
+
+\end{document}
