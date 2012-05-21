@@ -72,6 +72,13 @@ The implementation of the approach described in the assignment can be used as fo
 java -jar target/carver.jar -c 1 -v 200 -i images/tower.png
 ```
 
+This will take *Figure 1*, remove 200 vertical lines, line per line, and will display *Figure 2* on your screen.[^example1]
+
+[^example1]: This command can also be executed as `java -jar target/carver.jar @examples/example1`
+
+![Figure 1. images/tower.png \label{fig1}](images/tower.png)
+
+![Figure 2. After carving](images/tower-example1.png)
 
 ## Final thoughts ##
 
