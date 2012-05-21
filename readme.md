@@ -62,5 +62,16 @@ Usage: java -jar carver.jar [options]
                               Default: 0
 ```
 
+One thing that isn't mentioned in the usage output is that, as a side effect of using [JCommander](http://jcommander.org/) for parameter parsing, carver supports using the `@` syntax as well. This means that all the options can be put into a file, and this file can be passed with the `@` option. All the examples shown in this readme can be found in the `examples/` directory and can be executed using the `@` syntax.
+
+### Basic usage ###
+
+The implementation of the approach described in the assignment can be used as follows:
+
+```
+java -jar target/carver.jar -c 1 -v 200 -i images/tower.png
+```
+
+
 ## Final thoughts ##
 
