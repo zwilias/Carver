@@ -19,47 +19,54 @@ It can then be ran with `java -jar target/carver.jar`.
 
 Let's have a look at the output of `java -jar target/carver.jar`:
 
-```shell
+```
 carver/ › java -jar target/carver.jar 
 The following options are required: -i, --input 
 
 Usage: java -jar carver.jar [options]
   Options:
-    -a, --add-lines           When set, the image will be enlarged, not
-                              shrinked.
-                              Default: false
-        --help                Show usage.
-                              Default: false
-    -h, --horizontal          Number of horizontal lines to be removed or added.
-                              Default: 0
-  * -i, --input               Input image
-    -c, --lines-per-batch     How many lines will be removed in each batched
-                              action. Setting this to 1 will bypass batching.
-                              Default: 30
-    -o, --output              File to write the carved image to. (If not
-                              provided, image is displayed.
-    -p, --prioritize          Comma-separated list of pixels to prioritize. Each
-                              pixel is in the format of XxY, with X its x-coordinate,
-                              0-indexed on the left and Y its y-coordinate, 0-indexed on
-                              the top. These will be processed in the order in which
-                              they're supplied to create a shape with the supplied
-                              pixels functioning as corner-points.
-                              Default: []
-    -pi, --prioritizedPoint   A point that lies inside the shape described by
-                              the parameters to -p/--prioritize. Used to fill the
-                              shape. Mandatory when using -p/--priorize.
-    -s, --protect             Comma-separated list of pixels to protect. Each
-                              pixel is in the format of XxY, with X its x-coordinate,
-                              0-indexed on the left and Y its y-coordinate, 0-indexed on
-                              the top. These will be processed in the order in which
-                              they're supplied to create a shape with the supplied
-                              pixels functioning as corner-points.
-                              Default: []
-    -si, --protectedPoint     A point that lies inside the shape described by
-                              the parameters to -s/--protect. Used to fill the
-                              shape. Mandatory when using -s/--protect.
-    -v, --vertical            Number of vertical lines to be removed or added.
-                              Default: 0
+    -a, --add-lines              When set, the image will be enlarged, not
+                                 shrinked.
+                                 Default: false
+    -fb, --facebookAccessToken   A facebook OAuth access token. Check the readme
+                                 for details on how to obtain and use this. When
+                                 provided, the picture will also be uploaded to facebook.
+        --help                   Show usage.
+                                 Default: false
+    -h, --horizontal             Number of horizontal lines to be removed or
+                                 added.
+                                 Default: 0
+  * -i, --input                  Input image
+    -c, --lines-per-batch        How many lines will be removed in each batched
+                                 action. Setting this to 1 will bypass batching.
+                                 Default: 30
+    -o, --output                 File to write the carved image to. (If not
+                                 provided, image is displayed.
+    -p, --prioritize             Comma-separated list of pixels to prioritize.
+                                 Each pixel is in the format of XxY, with X its
+                                 x-coordinate, 0-indexed on the left and Y its y-coordinate,
+                                 0-indexed on the top. These will be processed in the
+                                 order in which they're supplied to create a shape
+                                 with the supplied pixels functioning as
+                                 corner-points.
+                                 Default: []
+    -pi, --prioritizedPoint      A point that lies inside the shape described by
+                                 the parameters to -p/--prioritize. Used to fill the
+                                 shape. Mandatory when using -p/--priorize.
+    -s, --protect                Comma-separated list of pixels to protect. Each
+                                 pixel is in the format of XxY, with X its
+                                 x-coordinate, 0-indexed on the left and Y its y-coordinate,
+                                 0-indexed on the top. These will be processed in the
+                                 order in which they're supplied to create a shape
+                                 with the supplied pixels functioning as
+                                 corner-points.
+                                 Default: []
+    -si, --protectedPoint        A point that lies inside the shape described by
+                                 the parameters to -s/--protect. Used to fill the
+                                 shape. Mandatory when using -s/--protect.
+    -v, --vertical               Number of vertical lines to be removed or
+                                 added.
+                                 Default: 0
 ```
 
 One thing that isn't mentioned in the usage output is that, as a side effect of using [JCommander](http://jcommander.org/) for parameter parsing, carver supports using the `@` syntax as well. This means that all the options can be put into a file, and this file can be passed with the `@` option. All the examples shown in this readme can be found in the `examples/` directory and can be executed using the `@` syntax.

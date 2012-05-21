@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <meta name="author" content="Ilias Van Peer, 2TX3/4">
+  <meta name="dcterms.date" content="2012-05-20">
+  <title>DIP Assignment - Content Aware Scaling</title>
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="stylesheet" href="readme/readme.css">
+</head>
+<body>
+<div id="page">
+<header>
+<h1 class="title">DIP Assignment - Content Aware Scaling</h1>
+<h2 class="author">Ilias Van Peer, 2TX3/4</h2>
+<h3 class="date">May 20, 2012</h3>
+</header>
+<h2>Table of Contents</h2>
+<nav id="TOC">
+<ul>
+<li><a href="#carver">Carver</a><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#features">Features</a><ul>
+<li><a href="#basic-usage">Basic usage</a></li>
+<li><a href="#changing-the-height">Changing the height</a></li>
+<li><a href="#optimization">Optimization</a></li>
+<li><a href="#protecting-and-prioritizing-pixels">Protecting and prioritizing pixels</a></li>
+<li><a href="#enlarging-images">Enlarging Images</a></li>
+<li><a href="#upload-to-facebook">Upload to Facebook</a></li>
+</ul></li>
+<li><a href="#references-and-links">References and links</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="carver"><a href="#TOC">Carver</a></h1>
+<h2 id="installation"><a href="#TOC">Installation</a></h2>
+<p><strong>Carver</strong> is a <a href="http://maven.apache.org/">maven project</a>. This is mostly for automatic dependency resolution and as a way of experimenting with maven. However, ImageJ is not part of the default maven repository, so after installing maven, ImageJ can be added to your local repository like this:</p>
+<pre><code>mvn install:install-file -DgroupId=gov.nih -DartifactId=ij -Dversion=1.0 -Dpackaging=jar -Dfile=/path/to/ij.jar</code></pre>
+<p>After that, executing <code>mvn install</code> in the directory where <code>pom.xml</code> is located will create a directory named <code>target</code> containing a number of files, including <code>carver.jar</code> which is the final, executable jar-file including all dependencies.</p>
+<p>It can then be ran with <code>java -jar target/carver.jar</code>.</p>
+<h2 id="features"><a href="#TOC">Features</a></h2>
+<p>Let’s have a look at the output of <code>java -jar target/carver.jar</code>:</p>
+<pre><code>carver/ › java -jar target/carver.jar 
+The following options are required: -i, --input 
+
+Usage: java -jar carver.jar [options]
+  Options:
+    -a, --add-lines              When set, the image will be enlarged, not
+                                 shrinked.
+                                 Default: false
+    -fb, --facebookAccessToken   A facebook OAuth access token. Check the readme
+                                 for details on how to obtain and use this. When
+                                 provided, the picture will also be uploaded to facebook.
+        --help                   Show usage.
+                                 Default: false
+    -h, --horizontal             Number of horizontal lines to be removed or
+                                 added.
+                                 Default: 0
+  * -i, --input                  Input image
+    -c, --lines-per-batch        How many lines will be removed in each batched
+                                 action. Setting this to 1 will bypass batching.
+                                 Default: 30
+    -o, --output                 File to write the carved image to. (If not
+                                 provided, image is displayed.
+    -p, --prioritize             Comma-separated list of pixels to prioritize.
+                                 Each pixel is in the format of XxY, with X its
+                                 x-coordinate, 0-indexed on the left and Y its y-coordinate,
+                                 0-indexed on the top. These will be processed in the
+                                 order in which they&#39;re supplied to create a shape
+                                 with the supplied pixels functioning as
+                                 corner-points.
+                                 Default: []
+    -pi, --prioritizedPoint      A point that lies inside the shape described by
+                                 the parameters to -p/--prioritize. Used to fill the
+                                 shape. Mandatory when using -p/--priorize.
+    -s, --protect                Comma-separated list of pixels to protect. Each
+                                 pixel is in the format of XxY, with X its
+                                 x-coordinate, 0-indexed on the left and Y its y-coordinate,
+                                 0-indexed on the top. These will be processed in the
+                                 order in which they&#39;re supplied to create a shape
+                                 with the supplied pixels functioning as
+                                 corner-points.
+                                 Default: []
+    -si, --protectedPoint        A point that lies inside the shape described by
+                                 the parameters to -s/--protect. Used to fill the
+                                 shape. Mandatory when using -s/--protect.
+    -v, --vertical               Number of vertical lines to be removed or
+                                 added.
+                                 Default: 0</code></pre>
+<p>One thing that isn’t mentioned in the usage output is that, as a side effect of using <a href="http://jcommander.org/">JCommander</a> for parameter parsing, carver supports using the <code>@</code> syntax as well. This means that all the options can be put into a file, and this file can be passed with the <code>@</code> option. All the examples shown in this readme can be found in the <code>examples/</code> directory and can be executed using the <code>@</code> syntax.</p>
+<h3 id="basic-usage"><a href="#TOC">Basic usage</a></h3>
+<p>The implementation of the approach described in the assignment can be used as follows:</p>
+<pre><code>java -jar target/carver.jar -c 1 -v 200 -i images/tower.png</code></pre>
+<p>This will take <em>Figure 1</em>, remove 200 vertical lines, line by line, and will display <em>Figure 2</em> on your screen.<sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup> The <code>-v</code> and <code>-i</code> parameters are self-explanatory. The <code>-c 1</code> parameter merely means we want to bypass the <a href="#optimization">batch-mode optimization</a> and handle this line by line.</p>
+<figure>
+<img src="images/tower.png" alt="Figure 1. images/tower.png "><figcaption>Figure 1. images/tower.png </figcaption>
+</figure>
+<figure>
+<img src="images/tower-example1.png" alt="Figure 2. After carving"><figcaption>Figure 2. After carving</figcaption>
+</figure>
+<h3 id="changing-the-height"><a href="#TOC">Changing the height</a></h3>
+<p>As well as horizontal resizing, we can change the height by supplying the number of horizontal lines that must be removed using <code>-h</code> or <code>--horizontal</code>. For example, we can remove 200 vertical lines as well as 100 horizontal lines from <em>Figure 1</em> using the following command, yielding us <em>Figure 3</em>.<sup><a href="#fn2" class="footnoteRef" id="fnref2">2</a></sup></p>
+<pre><code>java -jar target/carver.jar -c 1 -v 200 -h 100 -i images/tower.png</code></pre>
+<figure>
+<img src="images/tower-example2.png" alt="Figure 3. Changing the height"><figcaption>Figure 3. Changing the height</figcaption>
+</figure>
+<h3 id="optimization"><a href="#TOC">Optimization</a></h3>
+<p>Batch-mode (i.e. selecting multiple non-overlapping low-importance rows) removal proved to be a huge performance booster. Let’s compare some metrics on batch-processing vs line-by-line processing:</p>
+<pre><code>carver/ › time java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png
+java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png  17.42s user 0.50s system 64% cpu 27.716 total
+
+carver/ › time java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png 
+java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png  2.61s user 0.25s system 73% cpu 3.895 total
+
+carver/ › time java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png
+java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.67s user 0.16s system 63% cpu 2.858 total</code></pre>
+<p>Clearly, this is a huge win. The default number of lines processed in each batch is 30. This seems to give a good balance between speed and actually selecting nonimportant lines on regular images. Setting the number too high (for example 200) will result in an image that looks like it has been resized with a regular algorithm, as it will have to select more and more important lines due to collisions in the less important lines, which are resolved after actually removing the line and re-running the Sobel and Gray8Max filters.</p>
+<p>Other than batch-mode processing, I tried to use the <code>final</code> modifier wherever possible and used an <code>int[][]</code> instead of a <code>ByteProcessor</code> in the intermediary steps. Besides being slightly faster, this also allowed stricter bounds checking due to <code>ArrayIndexOutOfBounds</code> errors which <code>ByteProcessor</code> doesn’t throw.</p>
+<p>However, there are still many things that could be severely optimized left.</p>
+<ul>
+<li><p>Not desaturating after every batch</p>
+<p>It would be trivial to pass the <code>int[][]</code> generated by the desaturation algorithm to the <code>LineChanger</code>, so it can remove/add rows as applicable, thus preventing the need to desaturate the intermediary image all the time.</p></li>
+<li><p>Only Applying the Gray8Max and Sobel filters where necessary.</p>
+<p>Currently, the Sobel and Gray8Max filters are applied to the whole image after every batch. This could be changed to only process the areas around the removed line(s), as they’re both just 3x3 filters.</p></li>
+<li><p>…</p></li>
+</ul>
+<h3 id="protecting-and-prioritizing-pixels"><a href="#TOC">Protecting and prioritizing pixels</a></h3>
+<p>Using the <code>-p/--prioritize</code> option with the <code>-pi/--prioritizedPoint</code> option or the <code>-s/--protect</code> and the <code>-si/--protectedPoint</code> options allows prioritizing and protected regions. Both option-pairs work similarly. Using <code>-p</code> (or <code>-s</code>), any number of pixels is supplied, which will be used to generate a shape by calculating the lines connecting each of the pixels as well as the line connecting the last to the first of those pixels. Then the pixel provided by the <code>-pi</code> option (or the <code>-si</code> option) is used as a seed for a simple flood filling algorithm, which steps through all the pixels around the selected pixel, marking them as filled. This raster of pixels is then used while calculating the cumulative importance, overwriting the calculated values with either -99999 when prioritizing or +99999 when protecting pixels. During the removal/addition of lines, these rasters are updated accordingly.</p>
+<p>Sadly, however, priorization doesn’t work well in combination with batching - too many collisions will occur in the area under the prioritized area. As such batching must be disabled. But that’s not all; our algorithms are limited to their very direct neighbours, which makes them fast but also limits the “attraction” that a prioritized area would otherwise have, thus limiting the lines affected by it to the lines that would already be passing through the area. As such, the results look… Wonky. As an example; consider <em>Figure 4</em><sup><a href="#fn3" class="footnoteRef" id="fnref3">3</a></sup>, which is our good old <code>tower.png</code>, minus the lady.</p>
+<pre><code>java -jar target/carver.jar -v 70 -c 1 -p 58x403,80x403,83x441,70x541,58x441 -pi 70x428 -i images/tower.png</code></pre>
+<figure>
+<img src="images/tower-example3.png" alt="Figure 4. Prioritizing an area"><figcaption>Figure 4. Prioritizing an area</figcaption>
+</figure>
+<h3 id="enlarging-images"><a href="#TOC">Enlarging Images</a></h3>
+<p>This was a fairly simple feature to implement, though it does “require” batchmode in order to make the result look decent - the added rows will automatically seem less important due to them being the average of their neighbors. For example:<sup><a href="#fn4" class="footnoteRef" id="fnref4">4</a></sup></p>
+<pre><code>java -jar target/carver.jar -v 100 -h 50 -a -i images/tower.png</code></pre>
+<figure>
+<img src="images/tower-example4.png" alt="Figure 5. Enlarged image"><figcaption>Figure 5. Enlarged image</figcaption>
+</figure>
+<h3 id="upload-to-facebook"><a href="#TOC">Upload to Facebook</a></h3>
+<p>Mostly out of curiosity, I also implemented uploading to facebook using the simple and flexible <a href="http://restfb.com/">RestFB Facebook Graph API Client Library</a>. Uploading to facebook, however, requires the use of an OAuth Access Token. This is bound to both the application and the user, so for now, we just ask for the Access Token to be passed in as a parameter with <code>-fb</code>.</p>
+<p>Acquiring an access token is quite simple. Go to the <a href="https://developers.facebook.com/tools/explorer">Graph API Explorer</a> tool, hit “Get Access Token”, make sure <code>publish_stream</code> is checked under “Extended Permissions”, hit “Get Access Token”, and copy-paste the token facebook generated. When supplied through the <code>-fb</code> parameter, carver will upload the picture to facebook as well as execute the default action (i.e. displaying it or writing it to a file when <code>-o</code> is supplied.)</p>
+<p>It will spit out a link to the image, and that’s all there is to it.</p>
+<h2 id="references-and-links"><a href="#TOC">References and links</a></h2>
+<p>Carver is built on a number of libraries:</p>
+<ul>
+<li>Good old <a href="http://rsbweb.nih.gov/ij/">ImageJ</a> for manipulating images.</li>
+<li>The pretty awesome, annotation based command-line argument parser <a href="http://jcommander.org/">JCommander</a>.</li>
+<li>The amazingly simple <a href="http://restfb.com/">RestFB</a> <a href="https://developers.facebook.com/docs/reference/api/">Facebook Graph API</a> Client library.</li>
+<li>The fairly straightforward <a href="http://maven.apache.org/">Maven</a> “software project management and comprehension tool”.</li>
+</ul>
+<p>Another tool used during the development of carver is the “don’t feel too proud of this code, son” tool <a href="http://pmd.sourceforge.net/pmd-5.0.0/">PMD</a>. It has proven to be quite useful in spotting all kinds of problems early on.</p>
+<p>This readme file was created using <a href="http://johnmacfarlane.net/pandoc/">pandoc</a>, the universal document converter.</p>
+<p>The “rendering a line on a raster based on 2 endpoints” algorithm used in carver is an implementation of the pseudo-code version of <a href="http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm#Simplification">Bresenham’s line algorithm</a> as found on wikipedia.</p>
+<p>Finally, <a href="http://github.com">github</a> is pretty awesome.</p>
+<section class="footnotes">
+<hr>
+<ol>
+<li id="fn1"><p>This command can also be executed as <code>java -jar target/carver.jar @examples/example1</code><a href="#fnref1">↩</a></p></li>
+<li id="fn2"><p>Again, this command can also be executed by running <code>java -jar target/carver.jar @examples/example2</code><a href="#fnref2">↩</a></p></li>
+<li id="fn3"><p>And once more: <code>java -jar target/carver.java @examples/example3</code><a href="#fnref3">↩</a></p></li>
+<li id="fn4"><p>And finally: <code>java -jar target/carver.java @examples/example4</code><a href="#fnref4">↩</a></p></li>
+</ol>
+</section>
+</div>
+</body>
+</html>
