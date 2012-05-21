@@ -69,6 +69,11 @@
             <artifactId>jcommander</artifactId>
             <version>1.25</version>
         </dependency>
+        <dependency>
+            <groupId>com.restfb</groupId>
+            <artifactId>restfb</artifactId>
+            <version>1.6.9</version>
+        </dependency>
     </dependencies>
 
 </project>
