@@ -72,6 +72,7 @@ pre, p code, p tt {
 }
 
 pre {
+    border-color: #CCC;
     padding: 6px 10px;
     font-size: 13px;
     line-height: 19px;
@@ -87,8 +88,57 @@ figure {
 
     figcaption {
         text-align: center;
+        font-style: italic;
     }
 
     margin: 15px 0;
     margin-top: 0;
 }
+
+sup, sub {
+    font-size:xx-small;
+}
+
+sup * {
+    vertical-align: top;
+}
+
+sub * {
+    vertical-align: bottom;
+}
+
+ul {
+    list-style-type: disc;
+    margin-left: 20px;
+}
+
+ol {
+    list-style-type: decimal;
+    margin-left: 20px;
+}
+
+ul ul {
+    list-style-type: square;
+}
+
+ul ul ul {
+    list-style-type: circle;
+}
+
+em {
+    font-style: italic;
+}
+
+strong {
+    font-weight: bold;
+}
+
+.footnotes {
+    font-size: 13px;
+
+    li p {
+        margin: 0;
+    }
+}
+
+
