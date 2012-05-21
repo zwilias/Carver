@@ -1,0 +1,75 @@
+@import url(reset.css);
+body {
+  font: 14px Helvetica,arial,freesans,clean,sans-serif;
+  line-height: 1.6;
+  text-rendering: optimizeLegibility;
+  color: #333; }
+
+h1 {
+  font-size: 28px; }
+
+h2 {
+  font-size: 24px;
+  border-bottom: 1px solid #CCC; }
+
+h3 {
+  font-size: 18px; }
+
+h1, h2, h3 {
+  margin-bottom: 10px;
+  color: black;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  margin: 20px 0 10px; }
+
+hr {
+  color: #CCC;
+  background-color: #CCC;
+  height: 1px;
+  border: 0; }
+
+#page {
+  width: 900px;
+  margin: 0 auto;
+  border-left: 2px solid #EEE;
+  border-right: 2px solid #EEE;
+  padding: 10px 30px; }
+
+a {
+  color: #4183C4;
+  text-decoration: none; }
+
+a:hover {
+  text-decoration: underline; }
+
+p {
+  margin: 15px 0;
+  margin-top: 0; }
+
+code, pre, tt {
+  font-size: 12px;
+  font-family: "Bitstream Vera Sans Mono","Courier",monospace; }
+
+pre, p code, p tt {
+  margin: 0 2px;
+  padding: 0 5px;
+  border: 1px solid #EAEAEA;
+  background-color: #F8F8F8;
+  border-radius: 3px;
+  white-space: pre; }
+
+pre {
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 19px;
+  overflow: auto;
+  margin: 15px 0; }
+
+figure {
+  margin: 15px 0;
+  margin-top: 0; }
+  figure img {
+    margin: 0 auto;
+    display: block; }
+  figure figcaption {
+    text-align: center; }
