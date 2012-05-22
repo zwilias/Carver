@@ -1,6 +1,7 @@
 @import "reset.css";
 
 body {
+    background-color: #F8F8F8;
     font: 14px Helvetica,arial,freesans,clean,sans-serif;
     line-height: 1.6;
     text-rendering: optimizeLegibility;
@@ -36,6 +37,7 @@ hr {
 }
 
 #page {
+    background-color: white;
     width: 900px;
     margin: 0 auto;
     border-left: 1px solid #CCC;

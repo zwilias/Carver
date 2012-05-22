@@ -54,6 +54,7 @@ $if(toc)$
 <nav id="$idprefix$TOC">
 $toc$
 </nav>
+<hr />
 $endif$
 $body$
 $for(include-after)$
