@@ -8,6 +8,25 @@ body {
     color: #333;
 }
 
+header {
+    position: relative;
+    h2.author {
+        position: absolute;
+        right: 0;
+    }
+
+    h3.date {
+        position: absolute;
+        top: 0;
+        right: 0;
+        margin-top: 0;
+    }
+
+    h3.date, h1.title {
+        line-height: 44px;
+    }
+}
+
 h1 {
     font-size: 28px;
 }

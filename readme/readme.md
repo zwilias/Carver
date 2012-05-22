@@ -130,6 +130,12 @@ However, there are still many things that could be severely optimized left.
 
   - ...
 
+Finally, images look a little more natural when they were scaled using batch-processing. However, as mentioned before, the number of lines shouldn't be set too high. As a matter of reference, the tower image after removing 200 vertical lines, removing 30 lines and 200 lines at once respectively.
+
+![With -c 30](images/tower-30.png)
+
+![With -c 200](images/tower-200.png)
+
 ### Protecting and prioritizing pixels ###
 
 Using the `-p/--prioritize` option with the `-pi/--prioritizedPoint` option or the `-s/--protect` and the `-si/--protectedPoint` options allows prioritizing and protected regions. Both option-pairs work similarly. Using `-p` (or `-s`), any number of pixels is supplied, which will be used to generate a shape by calculating the lines connecting each of the pixels as well as the line connecting the last to the first of those pixels. Then the pixel provided by the `-pi` option (or the `-si` option) is used as a seed for a simple flood filling algorithm, which steps through all the pixels around the selected pixel, marking them as filled. This raster of pixels is then used while calculating the cumulative importance, overwriting the calculated values with either -99999 when prioritizing or +99999 when protecting pixels. During the removal/addition of lines, these rasters are updated accordingly.

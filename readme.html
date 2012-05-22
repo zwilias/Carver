@@ -128,6 +128,13 @@ java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.6
 <p>Currently, the Sobel and Gray8Max filters are applied to the whole image after every batch. This could be changed to only process the areas around the removed line(s), as they’re both just 3x3 filters.</p></li>
 <li><p>…</p></li>
 </ul>
+<p>Finally, images look a little more natural when they were scaled using batch-processing. However, as mentioned before, the number of lines shouldn’t be set too high. As a matter of reference, the tower image after removing 200 vertical lines, removing 30 lines and 200 lines at once respectively.</p>
+<figure>
+<img src="images/tower-30.png" alt="With -c 30"><figcaption>With -c 30</figcaption>
+</figure>
+<figure>
+<img src="images/tower-200.png" alt="With -c 200"><figcaption>With -c 200</figcaption>
+</figure>
 <h3 id="protecting-and-prioritizing-pixels"><a href="#TOC">Protecting and prioritizing pixels</a></h3>
 <p>Using the <code>-p/--prioritize</code> option with the <code>-pi/--prioritizedPoint</code> option or the <code>-s/--protect</code> and the <code>-si/--protectedPoint</code> options allows prioritizing and protected regions. Both option-pairs work similarly. Using <code>-p</code> (or <code>-s</code>), any number of pixels is supplied, which will be used to generate a shape by calculating the lines connecting each of the pixels as well as the line connecting the last to the first of those pixels. Then the pixel provided by the <code>-pi</code> option (or the <code>-si</code> option) is used as a seed for a simple flood filling algorithm, which steps through all the pixels around the selected pixel, marking them as filled. This raster of pixels is then used while calculating the cumulative importance, overwriting the calculated values with either -99999 when prioritizing or +99999 when protecting pixels. During the removal/addition of lines, these rasters are updated accordingly.</p>
 <p>Sadly, however, priorization doesn’t work well in combination with batching - too many collisions will occur in the area under the prioritized area. As such batching must be disabled. But that’s not all; our algorithms are limited to their very direct neighbours, which makes them fast but also limits the “attraction” that a prioritized area would otherwise have, thus limiting the lines affected by it to the lines that would already be passing through the area. As such, the results look… Wonky. As an example; consider <em>Figure 4</em><sup><a href="#fn3" class="footnoteRef" id="fnref3">3</a></sup>, which is our good old <code>tower.png</code>, minus the lady.</p>
