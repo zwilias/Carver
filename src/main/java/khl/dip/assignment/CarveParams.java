@@ -3,7 +3,6 @@ package khl.dip.assignment;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.converters.CommaParameterSplitter;
-import com.beust.jcommander.validators.PositiveInteger;
 import ij.ImagePlus;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ public class CarveParams {
                description = "Input image")
     public ImagePlus img;
     
-    // TODO: throws a numberformatexception when not a number. damnit.
     @Parameter(names = {"-v", "--vertical"},
                description = "Number of vertical lines to be removed or added.",
                validateWith = PositiveInteger.class)
