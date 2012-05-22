@@ -15,13 +15,15 @@ public abstract class AbstractLineChanger {
     public boolean[][] prioritizedPixels;
     public boolean[][] protectedPixels;
 
-    public ImageProcessor changeLine(final int[][] toChange, final ImageProcessor imageProcessor, final boolean addLines, final boolean[][] prioritizedPixels, final boolean[][] protectedPixels) {
+    public ImageProcessor changeLine(final int[][] toChange, final ImageProcessor imageProcessor, final boolean addLines, final boolean markLines, final boolean[][] prioritizedPixels, final boolean[][] protectedPixels) {
         this.prioritizedPixels = prioritizedPixels;
         this.protectedPixels = protectedPixels;
         ImageProcessor result;
 
         if (addLines) {
             result = addLine(toChange, imageProcessor);
+        } else if(markLines) {
+            result = markLine(toChange, imageProcessor);
         } else {
             result = removeLine(toChange, imageProcessor);
         }
@@ -32,6 +34,8 @@ public abstract class AbstractLineChanger {
     public abstract ImageProcessor addLine(int[][] toAdd, ImageProcessor imageProcessor);
 
     public abstract ImageProcessor removeLine(int[][] toRemove, ImageProcessor imageProcessor);
+    
+    public abstract ImageProcessor markLine(int[][] toMark, ImageProcessor imageProcessor);
 
     protected int average(final int color1, final int color2, final boolean gray8) {
         int result;

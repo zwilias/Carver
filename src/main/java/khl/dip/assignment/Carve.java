@@ -53,7 +53,7 @@ public class Carve {
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance, numLines);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
     }
@@ -62,7 +62,7 @@ public class Carve {
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
     }
@@ -93,7 +93,7 @@ public class Carve {
         this.grayscale = sobel.applyTo(grayscale);
 
         // Apply a 3x3 maximum filter to spread the influence of edges to nearby pixels. 
-        this.grayscale = grayMax.applyTo(grayscale);
+        //this.grayscale = grayMax.applyTo(grayscale);
     }
 
     // Step 2: Compute the Cumulative Importance

@@ -33,6 +33,6 @@ public class Desaturate {
     }
 
     public int desaturate(final int color) {
-        return (int) (0.21 * ((color & 0xff0000) >> 16) + 0.72 * ((color & 0x00ff00) >> 8) + 0.07 * (color & 0x0000ff));
+        return (int) Math.round(0.21 * ((color & 0xff0000) >> 16) + 0.72 * ((color & 0x00ff00) >> 8) + 0.07 * (color & 0x0000ff));
     }
 }

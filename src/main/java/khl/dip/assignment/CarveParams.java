@@ -67,6 +67,11 @@ public class CarveParams {
                description = "A facebook OAuth access token. Check the readme for details on how to obtain and use this. When provided, the picture will also be uploaded to facebook.")
     public String facebookAccessToken;
     
+    @Parameter(names = {"-m", "--mark"},
+               description = "Mark lines",
+               hidden = true)
+    public boolean markLines = false;
+    
     public boolean[][] prioritizedPixels;
     public boolean[][] protectedPixels;
 

@@ -35,18 +35,18 @@ public class CumulativeHorizontalImportance extends AbstractCumulativeImportance
     protected int getDirection(final int x, final int y) {
         int direction = 0;
         if (y == 0) {
-            if (importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
+            if (importanceGrid[y][x - 1] >= importanceGrid[y + 1][x - 1]) {
                 direction = 1;
             }
         } else if (y == this.height - 1) {
-            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1]) {
+            if (importanceGrid[y - 1][x - 1] <= importanceGrid[y][x - 1]) {
                 direction = -1;
             }
         } else {
-            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1] && importanceGrid[y][x - 1] <= importanceGrid[y + 1][x - 1]) {
+            if (importanceGrid[y - 1][x - 1] <= importanceGrid[y][x - 1] && importanceGrid[y][x - 1] <= importanceGrid[y + 1][x - 1]) {
                 // up smallest
                 direction = -1;
-            } else if (importanceGrid[y - 1][x - 1] >= importanceGrid[y][x - 1] && importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
+            } else if (importanceGrid[y - 1][x - 1] >= importanceGrid[y][x - 1] && importanceGrid[y][x - 1] >= importanceGrid[y + 1][x - 1]) {
                 // down smallest
                 direction = 1;
             }

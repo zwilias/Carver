@@ -83,4 +83,35 @@ public class HorizontalLineChanger extends AbstractLineChanger {
         this.protectedPixels = updatedProt;
         return newIp;
     }
+    
+    @Override
+    public ImageProcessor markLine(final int[][] toMark, final ImageProcessor imgProcessor) {
+        final int width = imgProcessor.getWidth();
+        final int height = imgProcessor.getHeight();
+        ImageProcessor newIp;
+
+        if (imgProcessor instanceof ColorProcessor) {
+            newIp = new ColorProcessor(width, height);
+        } else if (imgProcessor instanceof ByteProcessor) {
+            newIp = new ByteProcessor(width, height);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
+        int shift;
+        for (int x = 0; x < imgProcessor.getWidth(); x++) {
+            shift = 0;
+            for (int y = 0; y < imgProcessor.getHeight(); y++) {
+                if (shift < toMark.length && toMark[shift][x] == y) {
+                    shift++;
+                    newIp.putPixel(x, y, 255<<16);
+                } else {
+                    newIp.putPixel(x, y, imgProcessor.getPixel(x, y));
+
+                }
+            }
+        }
+
+        return newIp;
+    }
 }
