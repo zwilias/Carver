@@ -80,7 +80,6 @@ public class CumulativeHorizontalImportance extends AbstractCumulativeImportance
 
     @Override
     public int[][] getLeastImportantLines(final int count) {
-        int[][] sorted = new int[count][this.width];
         int[][] usedMatrix = new int[this.width][this.height];
         int[] tmp;
         final LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
@@ -116,6 +115,7 @@ public class CumulativeHorizontalImportance extends AbstractCumulativeImportance
             i += 1;
         }
 
+        int[][] sorted = new int[i][this.width];
         // Let's finish up by creating our actual result
         for (int x = 0; x < width; x++) {
             int cnt = 0;
