@@ -49,13 +49,18 @@ public class Carve {
         }
     }
 
-    private void execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger, final int numLines) {
+    private int execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger, final int numLines) {
+        int alteredLines;
+        
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance, numLines);
+        alteredLines = toChange.length;
         this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
+        
+        return alteredLines;
     }
 
     private void execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
@@ -69,14 +74,8 @@ public class Carve {
 
     private void batchAlterLines(final int linesToAlter, final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
         int linesDone = 0;
-        while (linesDone < linesToAlter - linesToAlter % params.linesPerTime) {
-            execAlter(cumulImportance, lineChanger, params.linesPerTime);
-            linesDone += params.linesPerTime;
-        }
-
-        // If we still have some lines left to handle, do it
-        if (linesToAlter % params.linesPerTime > 0) {
-            execAlter(cumulImportance, lineChanger, linesToAlter % params.linesPerTime);
+        while (linesDone < linesToAlter) {
+            linesDone += execAlter(cumulImportance, lineChanger, Math.min(params.linesPerTime, linesToAlter-linesDone));
         }
     }
 
