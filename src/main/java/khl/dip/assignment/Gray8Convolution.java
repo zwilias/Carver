@@ -17,7 +17,7 @@ public class Gray8Convolution extends AbstractGray8NeighborhoodOperation {
         final int iWidth = pixels.length;
         final int iHeight = pixels[0].length;
 
-        for (int i = -(kWidth - 1) / 2; i < (kWidth - 1) / 2; i++) {
+        for (int i = -(kWidth - 1) / 2; i <= (kWidth - 1) / 2; i++) {
             for (int j = -(kHeight - 1) / 2; j <= (kHeight - 1) / 2; j++) {
                 final int ipX = x + i;
                 final int ipY = y + j;
