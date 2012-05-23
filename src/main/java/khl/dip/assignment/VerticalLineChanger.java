@@ -82,4 +82,35 @@ public class VerticalLineChanger extends AbstractLineChanger {
         this.protectedPixels = updatedProt;
         return newIp;
     }
+    
+    
+    @Override
+    public ImageProcessor plotLine(final int[][] toPlot, final ImageProcessor imgProcessor) {
+        ImageProcessor newIp;
+        final int width = imgProcessor.getWidth();
+        final int height = imgProcessor.getHeight();
+
+        if (imgProcessor instanceof ColorProcessor) {
+            newIp = new ColorProcessor(width, height);
+        } else if (imgProcessor instanceof ByteProcessor) {
+            newIp = new ByteProcessor(width, height);
+        } else {
+            throw new UnsupportedOperationException();
+        }
+
+        int shift;
+        for (int y = 0; y < imgProcessor.getHeight(); y++) {
+            shift = 0;
+            for (int x = 0; x < imgProcessor.getWidth(); x++) {
+                if (shift < toPlot.length && toPlot[shift][y] == x) {
+                    shift += 1;
+                    newIp.putPixel(x, y, 255<<16);
+                } else {
+                    newIp.putPixel(x, y, imgProcessor.getPixel(x, y));
+                }
+            }
+        }
+
+        return newIp;
+    }
 }

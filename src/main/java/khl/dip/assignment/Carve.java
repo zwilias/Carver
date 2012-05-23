@@ -56,7 +56,7 @@ public class Carve {
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance, numLines);
         alteredLines = toChange.length;
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
         
@@ -67,7 +67,7 @@ public class Carve {
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
     }
