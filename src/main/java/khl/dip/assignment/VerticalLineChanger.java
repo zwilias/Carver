@@ -40,6 +40,7 @@ public class VerticalLineChanger extends AbstractLineChanger {
 
             for (int[] row : toAdd) {
                 newIp.putPixel(row[y] + 1, y, average(newIp.getPixel(row[y], y), newIp.getPixel(row[y] + 2, y), gray8));
+                updatedProt[row[y] + 1][y] = true;
             }
         }
 

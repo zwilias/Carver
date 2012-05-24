@@ -6,15 +6,10 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-/**
- * Hello world!
- *
- */
 public final class Carver {
     private Carver() {}
 
     public static void main(final String[] args) {
-        disableInfoLogging();
         
         final CarveParams carveParams = new CarveParams();
         final JCommander jCommander = new JCommander();
@@ -26,6 +21,9 @@ public final class Carver {
         try {
             jCommander.parse(args);
             carveParams.checkParams();
+            if (!carveParams.verbose) {
+                disableInfoLogging();
+            }
             if (carveParams.showUsage) {
                 System.out.println(usage);
             } else {

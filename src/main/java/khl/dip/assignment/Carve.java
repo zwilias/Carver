@@ -23,6 +23,7 @@ public class Carve {
     private int[][] grayscale;
     private final Sobel sobel = new Sobel();
     private final CarveParams params;
+    private static final Logger LOGGER = Logger.getLogger(Carve.class.toString());
 
     public Carve(final CarveParams params) {
         this.params = params;
@@ -30,9 +31,16 @@ public class Carve {
 
     public void run() {
         this.imgProcessor = params.img.getProcessor();
+        
+        LOGGER.log(Level.INFO, "Preparing to alter {0} vertical lines and {1} horizontal lines on a {2}x{3} image.", new Object[]{params.vertLinesToAlter, params.horiLinesToAlter, imgProcessor.getWidth(), imgProcessor.getHeight()});
 
         alterLines(params.vertLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
+        
+        LOGGER.log(Level.ALL, "Altered {0} vertical lines", params.vertLinesToAlter);
+        
         alterLines(params.horiLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
+        
+        LOGGER.log(Level.ALL, "Altered {0} horizontal lines", params.horiLinesToAlter);
 
         params.img.setProcessor(imgProcessor);
 

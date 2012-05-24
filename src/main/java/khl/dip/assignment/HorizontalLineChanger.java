@@ -40,6 +40,7 @@ public class HorizontalLineChanger extends AbstractLineChanger {
 
             for (int[] row : toAdd) {
                 newIp.putPixel(x, row[x] + 1, average(newIp.getPixel(x, row[x]), newIp.getPixel(x, row[x] + 2), gray8));
+                updatedProt[x][row[x] + 1] = true;
             }
         }
 

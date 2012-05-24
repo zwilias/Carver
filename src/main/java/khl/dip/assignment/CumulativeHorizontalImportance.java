@@ -2,8 +2,11 @@ package khl.dip.assignment;
 
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CumulativeHorizontalImportance extends AbstractCumulativeImportance {
+    private static final Logger LOGGER = Logger.getLogger(CumulativeHorizontalImportance.class.toString());
 
     @Override
     protected void populateDirections(final int[][] pixels) {
@@ -43,10 +46,10 @@ public class CumulativeHorizontalImportance extends AbstractCumulativeImportance
                 direction = -1;
             }
         } else {
-            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1] && importanceGrid[y][x - 1] <= importanceGrid[y + 1][x - 1]) {
+            if (importanceGrid[y - 1][x - 1] < importanceGrid[y][x - 1] && importanceGrid[y - 1][x - 1] <= importanceGrid[y + 1][x - 1]) {
                 // up smallest
                 direction = -1;
-            } else if (importanceGrid[y - 1][x - 1] >= importanceGrid[y][x - 1] && importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
+            } else if (importanceGrid[y - 1][x - 1] >= importanceGrid[y + 1][x - 1] && importanceGrid[y][x - 1] > importanceGrid[y + 1][x - 1]) {
                 // down smallest
                 direction = 1;
             }
@@ -125,6 +128,8 @@ public class CumulativeHorizontalImportance extends AbstractCumulativeImportance
                 }
             }
         }
+        
+        LOGGER.log(Level.INFO, "Found {0} non-colliding lines.", i);
 
         return sorted;
     }

@@ -105,16 +105,13 @@ Batch-mode (i.e. selecting multiple non-overlapping low-importance rows) removal
 
 ```
 carver/ › time java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png
-java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png  17.42s user 0.50s system 64% cpu 27.716 total
+java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png  21.30s user 0.47s system 97% cpu 22.306 total
 
-carver/ › time java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png 
-java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png  2.61s user 0.25s system 73% cpu 3.895 total
-
-carver/ › time java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png
-java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.67s user 0.16s system 63% cpu 2.858 total
+carver/ › time java -jar target/carver.jar -v 200 -i images/tower.png -o /tmp/o.png
+java -jar target/carver.jar -v 200 -i images/tower.png -o /tmp/o.png  6.38s user 0.32s system 89% cpu 7.484 total
 ```
 
-Clearly, this is a huge win. The default number of lines processed in each batch is 30. This seems to give a good balance between speed and actually selecting nonimportant lines on regular images. Setting the number too high (for example 200) will result in an image that looks like it has been resized with a regular algorithm, as it will have to select more and more important lines due to collisions in the less important lines, which are resolved after actually removing the line and re-running the Sobel and Gray8Max filters.
+Clearly, this is a pretty significant improvement. The default number of lines processed in each batch is 30 (can be overridden with the `-c` option), however, for most images this number will not be actually processed in each cycle. The actual number of lines that will be processed depends heavily on the image layout and dimensions.
 
 Other than batch-mode processing, I tried to use the `final` modifier wherever possible and used an `int[][]` instead of a `ByteProcessor` in the intermediary steps. Besides being slightly faster, this also allowed stricter bounds checking due to `ArrayIndexOutOfBounds` errors which `ByteProcessor` doesn't throw.
 
@@ -130,11 +127,15 @@ However, there are still many things that could be severely optimized left.
 
   - ...
 
-Finally, images look a little more natural when they were scaled using batch-processing. However, as mentioned before, the number of lines shouldn't be set too high. As a matter of reference, the tower image after removing 200 vertical lines, removing 30 lines and 200 lines at once respectively.
+As an example of an image with batch-processing enabled (i.e. lacking a `-c` param):
 
-![With -c 30](images/tower-30.png)
+```
+java -jar target/carver.jar -i tower.png -v 200
+```
 
-![With -c 200](images/tower-200.png)
+This will yield the following:
+
+![With batch-processing enabled.](images/tower-batch.png)
 
 ### Protecting and prioritizing pixels ###
 
@@ -152,7 +153,7 @@ java -jar target/carver.jar -v 70 -c 1 -p 58x403,80x403,83x441,70x541,58x441 -pi
 
 ### Enlarging Images ###
 
-This was a fairly simple feature to implement, though it does "require" batchmode in order to make the result look decent - the added rows will automatically seem less important due to them being the average of their neighbors. For example:[^example4]
+This was a fairly simple feature to implement, though it does "require" batchmode in order to make the result look decent - adding a row right next to an important line won't make that lines any less important, generally speaking. As a way of slightly alleviating that problem, we automatically add every pixel that was added to the list of protected pixels. For example:[^example4]
 
 ```
 java -jar target/carver.jar -v 100 -h 50 -a -i images/tower.png

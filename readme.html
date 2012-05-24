@@ -111,14 +111,11 @@ Usage: java -jar carver.jar [options]
 <h3 id="optimization"><a href="#TOC">Optimization</a></h3>
 <p>Batch-mode (i.e. selecting multiple non-overlapping low-importance rows) removal proved to be a huge performance booster. Let’s compare some metrics on batch-processing vs line-by-line processing:</p>
 <pre><code>carver/ › time java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png
-java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png  17.42s user 0.50s system 64% cpu 27.716 total
+java -jar target/carver.jar -v 200 -c 1 -i images/tower.png -o /tmp/o.png  21.30s user 0.47s system 97% cpu 22.306 total
 
-carver/ › time java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png 
-java -jar target/carver.jar -v 200 -c 30 -i images/tower.png -o /tmp/o.png  2.61s user 0.25s system 73% cpu 3.895 total
-
-carver/ › time java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png
-java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.67s user 0.16s system 63% cpu 2.858 total</code></pre>
-<p>Clearly, this is a huge win. The default number of lines processed in each batch is 30. This seems to give a good balance between speed and actually selecting nonimportant lines on regular images. Setting the number too high (for example 200) will result in an image that looks like it has been resized with a regular algorithm, as it will have to select more and more important lines due to collisions in the less important lines, which are resolved after actually removing the line and re-running the Sobel and Gray8Max filters.</p>
+carver/ › time java -jar target/carver.jar -v 200 -i images/tower.png -o /tmp/o.png
+java -jar target/carver.jar -v 200 -i images/tower.png -o /tmp/o.png  6.38s user 0.32s system 89% cpu 7.484 total</code></pre>
+<p>Clearly, this is a pretty significant improvement. The default number of lines processed in each batch is 30 (can be overridden with the <code>-c</code> option), however, for most images this number will not be actually processed in each cycle. The actual number of lines that will be processed depends heavily on the image layout and dimensions.</p>
 <p>Other than batch-mode processing, I tried to use the <code>final</code> modifier wherever possible and used an <code>int[][]</code> instead of a <code>ByteProcessor</code> in the intermediary steps. Besides being slightly faster, this also allowed stricter bounds checking due to <code>ArrayIndexOutOfBounds</code> errors which <code>ByteProcessor</code> doesn’t throw.</p>
 <p>However, there are still many things that could be severely optimized left.</p>
 <ul>
@@ -128,12 +125,11 @@ java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.6
 <p>Currently, the Sobel and Gray8Max filters are applied to the whole image after every batch. This could be changed to only process the areas around the removed line(s), as they’re both just 3x3 filters.</p></li>
 <li><p>…</p></li>
 </ul>
-<p>Finally, images look a little more natural when they were scaled using batch-processing. However, as mentioned before, the number of lines shouldn’t be set too high. As a matter of reference, the tower image after removing 200 vertical lines, removing 30 lines and 200 lines at once respectively.</p>
+<p>As an example of an image with batch-processing enabled (i.e. lacking a <code>-c</code> param):</p>
+<pre><code>java -jar target/carver.jar -i tower.png -v 200</code></pre>
+<p>This will yield the following:</p>
 <figure>
-<img src="images/tower-30.png" alt="With -c 30"><figcaption>With -c 30</figcaption>
-</figure>
-<figure>
-<img src="images/tower-200.png" alt="With -c 200"><figcaption>With -c 200</figcaption>
+<img src="images/tower-batch.png" alt="With batch-processing enabled."><figcaption>With batch-processing enabled.</figcaption>
 </figure>
 <h3 id="protecting-and-prioritizing-pixels"><a href="#TOC">Protecting and prioritizing pixels</a></h3>
 <p>Using the <code>-p/--prioritize</code> option with the <code>-pi/--prioritizedPoint</code> option or the <code>-s/--protect</code> and the <code>-si/--protectedPoint</code> options allows prioritizing and protected regions. Both option-pairs work similarly. Using <code>-p</code> (or <code>-s</code>), any number of pixels is supplied, which will be used to generate a shape by calculating the lines connecting each of the pixels as well as the line connecting the last to the first of those pixels. Then the pixel provided by the <code>-pi</code> option (or the <code>-si</code> option) is used as a seed for a simple flood filling algorithm, which steps through all the pixels around the selected pixel, marking them as filled. This raster of pixels is then used while calculating the cumulative importance, overwriting the calculated values with either -99999 when prioritizing or +99999 when protecting pixels. During the removal/addition of lines, these rasters are updated accordingly.</p>
@@ -143,7 +139,7 @@ java -jar target/carver.jar -v 200 -c 200 -i images/tower.png -o /tmp/o.png  1.6
 <img src="images/tower-example3.png" alt="Figure 4. Prioritizing an area"><figcaption>Figure 4. Prioritizing an area</figcaption>
 </figure>
 <h3 id="enlarging-images"><a href="#TOC">Enlarging Images</a></h3>
-<p>This was a fairly simple feature to implement, though it does “require” batchmode in order to make the result look decent - the added rows will automatically seem less important due to them being the average of their neighbors. For example:<sup><a href="#fn4" class="footnoteRef" id="fnref4">4</a></sup></p>
+<p>This was a fairly simple feature to implement, though it does “require” batchmode in order to make the result look decent - adding a row right next to an important line won’t make that lines any less important, generally speaking. As a way of slightly alleviating that problem, we automatically add every pixel that was added to the list of protected pixels. For example:<sup><a href="#fn4" class="footnoteRef" id="fnref4">4</a></sup></p>
 <pre><code>java -jar target/carver.jar -v 100 -h 50 -a -i images/tower.png</code></pre>
 <figure>
 <img src="images/tower-example4.png" alt="Figure 5. Enlarged image"><figcaption>Figure 5. Enlarged image</figcaption>

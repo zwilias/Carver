@@ -68,8 +68,13 @@ public class CarveParams {
     public String facebookAccessToken;
     
     @Parameter(names = {"-m", "--plot"},
-               description = "Plot the lines. Make sure the batch-size (-c) is equal to the number of lines to mark (-v or -h).")
+               description = "Plot the lines. Make sure the number of lines that will be handled is equal to the batch-size.",
+               hidden = true)
     public boolean markLines = false;
+    
+    @Parameter(names = {"-V", "--verbose"},
+               description = "Verbose output. WARNING: will give a LOT of output.")
+    public boolean verbose = false;
     
     public boolean[][] prioritizedPixels;
     public boolean[][] protectedPixels;
