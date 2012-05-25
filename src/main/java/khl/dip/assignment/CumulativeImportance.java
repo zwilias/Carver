@@ -101,7 +101,6 @@ public class CumulativeImportance {
 
     public int[][] getLeastImportantLines(final int count) {
         int[][] usedMatrix = new int[this.width][this.height];
-        int[] tmp;
         final LinkedList<SortableKeyValuePair> cumuls = new LinkedList<SortableKeyValuePair>();
         // First get all the cumulative importance things
         for (int i = 0; i < this.width; i++) {
@@ -109,12 +108,18 @@ public class CumulativeImportance {
         }
         Collections.sort(cumuls);
         int i = 0;
+        int key;
+        int[] tmp = new int[this.height];
         while (i < count && !cumuls.isEmpty()) {
-            tmp = getLine(cumuls.poll().getKey());
+            key = cumuls.poll().getKey();
             // Find out if this line crosses any other line already in the array
             boolean conflict = false;
+            int direction = 0;
             for (int y = this.height - 1; !conflict && y >= 0; y--) {
-                conflict = usedMatrix[tmp[y]][y] == 1;
+                key = key+direction;
+                tmp[y] = key;
+                direction = directions[key][y];
+                conflict = usedMatrix[key][y] == 1;
             }
             // If it does, head on to the next line
             if (conflict) {
