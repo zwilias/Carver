@@ -8,6 +8,8 @@ import com.restfb.Parameter;
 import com.restfb.types.FacebookType;
 import ij.ImagePlus;
 import ij.gui.ImageWindow;
+import ij.process.ByteProcessor;
+import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -21,9 +23,12 @@ public class Carve {
     private final Gray8Max grayMax = new Gray8Max();
     private ImageProcessor imgProcessor;
     private int[][] grayscale;
+    private int[][] grayimg;
     private final Sobel sobel = new Sobel();
     private final CarveParams params;
     private static final Logger LOGGER = Logger.getLogger(Carve.class.toString());
+    private final LineChanger lineChanger = new LineChanger();
+    private final CumulativeImportance cumulImportance = new CumulativeImportance();
 
     public Carve(final CarveParams params) {
         this.params = params;
@@ -32,58 +37,67 @@ public class Carve {
     public void run() {
         this.imgProcessor = params.img.getProcessor();
         
-        LOGGER.log(Level.INFO, "Preparing to alter {0} vertical lines and {1} horizontal lines on a {2}x{3} image.", new Object[]{params.vertLinesToAlter, params.horiLinesToAlter, imgProcessor.getWidth(), imgProcessor.getHeight()});
-
-        alterLines(params.vertLinesToAlter, new VerticalLineChanger(), new CumulativeVerticalImportance());
-        
-        LOGGER.log(Level.ALL, "Altered {0} vertical lines", params.vertLinesToAlter);
-        
-        alterLines(params.horiLinesToAlter, new HorizontalLineChanger(), new CumulativeHorizontalImportance());
-        
-        LOGGER.log(Level.ALL, "Altered {0} horizontal lines", params.horiLinesToAlter);
+        if (params.vertLinesToAlter > 0 || params.horiLinesToAlter > 0) {
+            // Means we actually have to do something.
+            this.grayimg = desaturate.applyTo(imgProcessor);
+            
+            alterLines(params.vertLinesToAlter);
+            
+            if (params.horiLinesToAlter > 0) {
+                imgProcessor = switchXandY(imgProcessor);
+                grayimg = switchXandY(grayimg);
+                params.prioritizedPixels = switchXandY(params.prioritizedPixels);
+                params.protectedPixels = switchXandY(params.protectedPixels);
+                alterLines(params.horiLinesToAlter);
+                grayimg = switchXandY(grayimg);
+                imgProcessor = switchXandY(imgProcessor);
+            }
+        }
 
         params.img.setProcessor(imgProcessor);
 
         showOrSave();
     }
 
-    private void alterLines(final int linesToAlter, final AbstractLineChanger lineChanger, final AbstractCumulativeImportance cumulImportance) {
+    private void alterLines(final int linesToAlter) {
         if (params.linesPerTime > 1) {
-            batchAlterLines(linesToAlter, cumulImportance, lineChanger);
+            batchAlterLines(linesToAlter);
         } else {
             for (int altered = 0; altered < linesToAlter; altered++) {
-                execAlter(cumulImportance, lineChanger);
+                execAlter();
             }
         }
     }
 
-    private int execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger, final int numLines) {
+    private int execAlter(final int numLines) {
         int alteredLines;
         
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance, numLines);
         alteredLines = toChange.length;
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels, grayimg);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
+        grayimg = lineChanger.grayimg;
         
         return alteredLines;
     }
 
-    private void execAlter(final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
+    private void execAlter() {
         importance();
         cumulativeImportance(cumulImportance, params.prioritizedPixels, params.protectedPixels);
         final int[][] toChange = minimalImportance(cumulImportance);
-        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels);
+        this.imgProcessor = lineChanger.changeLine(toChange, imgProcessor, params.addLines, params.markLines, params.prioritizedPixels, params.protectedPixels, grayimg);
         params.prioritizedPixels = lineChanger.prioritizedPixels;
         params.protectedPixels = lineChanger.protectedPixels;
+        grayimg = lineChanger.grayimg;
     }
 
-    private void batchAlterLines(final int linesToAlter, final AbstractCumulativeImportance cumulImportance, final AbstractLineChanger lineChanger) {
+    private void batchAlterLines(final int linesToAlter) {
         int linesDone = 0;
         while (linesDone < linesToAlter) {
-            linesDone += execAlter(cumulImportance, lineChanger, Math.min(params.linesPerTime, linesToAlter-linesDone));
+            linesDone += execAlter(Math.min(params.linesPerTime, linesToAlter-linesDone));
         }
     }
 
@@ -93,27 +107,24 @@ public class Carve {
 
     // Step 1: Compute the Importance
     private void importance() {
-        // Create a grayscale copy of the current image.
-        this.grayscale = desaturate.applyTo(imgProcessor);
-
         // Apply the Sobel operator to the grayscale copy to detect edges.
-        this.grayscale = sobel.applyTo(grayscale);
+        this.grayscale = sobel.applyTo(grayimg);
 
         // Apply a 3x3 maximum filter to spread the influence of edges to nearby pixels. 
         this.grayscale = grayMax.applyTo(grayscale);
     }
 
     // Step 2: Compute the Cumulative Importance
-    private void cumulativeImportance(final AbstractCumulativeImportance cumulImportance, final boolean[][] prioritized, final boolean[][] protectedPixels) {
+    private void cumulativeImportance(final CumulativeImportance cumulImportance, final boolean[][] prioritized, final boolean[][] protectedPixels) {
         cumulImportance.applyTo(grayscale, prioritized, protectedPixels);
     }
 
     // Step 3: Select a Line with Minimal Importance
-    private int[][] minimalImportance(final AbstractCumulativeImportance cumulImportance, final int count) {
+    private int[][] minimalImportance(final CumulativeImportance cumulImportance, final int count) {
         return cumulImportance.getLeastImportantLines(count);
     }
 
-    private int[][] minimalImportance(final AbstractCumulativeImportance cumulImportance) {
+    private int[][] minimalImportance(final CumulativeImportance cumulImportance) {
         return new int[][]{cumulImportance.getLine(cumulImportance.getLeastImportantLine())};
     }
 
@@ -149,5 +160,49 @@ public class Carve {
                 throw new ParameterException("Could not write to " + params.outFile + ": " + ex.getMessage());
             }
         }
+    }
+
+    private int[][] switchXandY(final int[][] orig) {
+        int[][] result = new int[orig[0].length][orig.length];
+        
+        for (int x = 0; x < orig.length; x++) {
+            for (int y = 0; y < orig[0].length; y++) {
+                result[y][x] = orig[x][y];
+            }
+        }
+        
+        return result;
+    }
+    
+    private boolean[][] switchXandY(final boolean[][] orig) {
+        boolean[][] result = new boolean[orig[0].length][orig.length];
+        
+        for (int x = 0; x < orig.length; x++) {
+            for (int y = 0; y < orig[0].length; y++) {
+                result[y][x] = orig[x][y];
+            }
+        }
+        
+        return result;
+    }
+    
+    private ImageProcessor switchXandY(final ImageProcessor orig) {
+        ImageProcessor result;
+        
+        if (orig instanceof ColorProcessor) {
+            result = new ColorProcessor(orig.getHeight(), orig.getWidth());
+        } else if (orig instanceof ByteProcessor) {
+            result = new ByteProcessor(orig.getHeight(), orig.getWidth());
+        } else {
+            throw new UnsupportedOperationException();
+        }
+        
+        for (int x = 0; x < orig.getWidth(); x++) {
+            for (int y = 0; y < orig.getHeight(); y++) {
+                result.putPixel(y, x, orig.getPixel(x, y));
+            }
+        }
+        
+        return result;
     }
 }
